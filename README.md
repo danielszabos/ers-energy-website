@@ -46,7 +46,6 @@ restart it to pick up new files.
 | `public/projects/project-1.jpg` … `project-3.jpg` | Recent projects cards, ideally 4:3 and at least 1200px wide. |
 | `public/about/hero.jpg` | About page hero, behind the heading (shaded dark). Landscape, at least 2000px wide. |
 | `public/about/story.jpg` | About page "Our story" photo, shown 4:3. Replace its alt text in `components/about/Story.tsx`. |
-| `public/about/mayor-visit.jpg` | About page, the Mayor's visit, shown 4:5. Currently a copy of `about.jpg`. |
 
 ## Logo
 
