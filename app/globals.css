@@ -1,0 +1,464 @@
+@import "tailwindcss";
+
+/*
+ * Brand palette. Tailwind's default colours are cleared, so these tokens are
+ * the only colours utilities can use (bg-deep-base, text-deep-green, ...).
+ *
+ * - Roughly 60% whites/off-whites, 30% charcoal/deep-base, 10% greens/lime.
+ * - brand-green, light-green and lime are never text on light backgrounds:
+ *   use deep-green there. On deep-base, all greens and lime are fine.
+ * - Green buttons carry deep-base text.
+ * - Lime is a rare highlight on light sections (one small touch per screen).
+ */
+@theme {
+  --color-*: initial;
+
+  --color-brand-green: #8cc63e;
+  --color-light-green: #a4cf63;
+  --color-lime: #d6df22;
+  --color-charcoal: #4e4e4d;
+  --color-white: #ffffff;
+
+  --color-deep-base: #1e2420;
+  --color-deep-green: #4f7a1f;
+  --color-mid-grey: #6b6d6a;
+  --color-border-grey: #e2e4df;
+  --color-off-white: #f5f6f2;
+  --color-green-tint: #eef6e3;
+
+  /* Form validation messages and invalid fields only. */
+  --color-error: #b3261e;
+
+  /* Illustration only: weathered roof sheets in the roof-to-solar scene. */
+  --color-rust: #a4643a;
+  --color-rust-dark: #6f4128;
+
+  /* Hero video shading only: as dark as deep-base, without its green cast. */
+  --color-video-shade: #222222;
+
+  --shadow-card: 0 22px 40px -28px
+    color-mix(in srgb, var(--color-deep-base) 45%, transparent);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Dark surfaces switch the focus ring to a green that reads on deep-base. */
+@utility on-dark {
+  --focus-ring: var(--color-light-green);
+}
+
+@layer base {
+  :root {
+    --focus-ring: var(--color-deep-green);
+  }
+
+  html {
+    scroll-padding-top: 6.5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html[data-menu-open],
+  html:has(dialog:modal) {
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--color-white);
+    color: var(--color-charcoal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-green);
+    color: var(--color-deep-base);
+  }
+}
+
+/* ---------- Logo draw-in ---------- */
+
+/* Parts are the named groups in /public/logo/ers-logo-white-text.svg. */
+.logo-draw :is(#logo-bar-1, #logo-bar-2, #logo-lime, #logo-text) {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+/* On the light nav bar, the white wordmark switches to the logo's charcoal. */
+#logo-text {
+  transition: fill 0.3s ease-out;
+}
+
+[data-solid] #logo-text {
+  fill: var(--color-charcoal);
+}
+
+/* Visible overflow lets the parts slide in from outside the logo's box. */
+.logo > svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  overflow: visible;
+}
+
+@keyframes logo-bar {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+}
+
+@keyframes logo-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-180%);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(14%);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo-draw #logo-bar-1 {
+    animation: logo-bar 0.5s var(--ease-out-soft) 0.05s both;
+  }
+  .logo-draw #logo-bar-2 {
+    animation: logo-bar 0.5s var(--ease-out-soft) 0.25s both;
+  }
+  .logo-draw #logo-lime {
+    animation: logo-drop 0.45s ease-out 0.55s both;
+  }
+  .logo-draw #logo-text {
+    animation: fade-up 0.45s var(--ease-out-soft) 0.75s both;
+  }
+  /* Logo file without named parts: bring it in as one piece. */
+  .logo-fade {
+    animation: rise-in 0.7s var(--ease-out-soft) 0.1s both;
+  }
+}
+
+/* ---------- Hero ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-enter {
+    animation: rise-in 0.9s var(--ease-out-soft) var(--enter-delay, 0ms) both;
+  }
+}
+
+/* Light shading over the hero video, only where text sits. A band behind the
+   nav fades out quickly: */
+.hero-top-shade {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-video-shade) 48.75%, transparent) 0,
+    color-mix(in srgb, var(--color-video-shade) 41.25%, transparent) 4.5rem,
+    transparent 11.25rem
+  );
+}
+
+/* ...and a gradient sits behind the headline, intro and buttons. */
+.hero-scrim {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-video-shade) 63.75%, transparent) 0%,
+    color-mix(in srgb, var(--color-video-shade) 45%, transparent) 50%,
+    color-mix(in srgb, var(--color-video-shade) 18.75%, transparent) 85%,
+    transparent 100%
+  );
+}
+
+@media (min-width: 64rem) {
+  .hero-scrim {
+    background:
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-video-shade) 41.25%, transparent),
+        transparent 75%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-video-shade) 63.75%, transparent) 0%,
+        color-mix(in srgb, var(--color-video-shade) 48.75%, transparent) 40%,
+        transparent 80%
+      );
+  }
+}
+
+/* ---------- Accreditations marquee ---------- */
+
+.marquee {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 55s linear infinite;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* ---------- Scroll reveal ---------- */
+
+/* Content only starts hidden once JS is running, so it is never lost. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    transition:
+      opacity 0.8s var(--ease-out-soft),
+      transform 0.8s var(--ease-out-soft);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+/* ---------- Survey questionnaire ---------- */
+
+/* Each step slides in from the side it's coming from. */
+@keyframes step-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+}
+
+@keyframes step-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .survey-step[data-direction="forward"] {
+    animation: step-in-forward 0.45s var(--ease-out-soft) both;
+  }
+  .survey-step[data-direction="back"] {
+    animation: step-in-back 0.45s var(--ease-out-soft) both;
+  }
+  .survey-done {
+    animation: rise-in 0.6s var(--ease-out-soft) both;
+  }
+}
+
+/* ---------- Service details window ---------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .service-dialog[open] {
+    animation: rise-in 0.45s var(--ease-out-soft) both;
+  }
+  .service-dialog[open]::backdrop {
+    animation: fade-in 0.3s ease-out both;
+  }
+}
+
+/* ---------- Gallery photo viewer ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .photo-dialog[open] {
+    animation: fade-in 0.25s ease-out both;
+  }
+  /* Each photo fades in as you step through them. */
+  .photo-dialog-image {
+    animation: fade-in 0.35s ease-out both;
+  }
+}
+
+/* ---------- About: how ERS works ---------- */
+
+/* The green line between steps grows down (stacked) or across (in a row), one
+   stretch after another, once the list has scrolled into view. Without JS or
+   with reduced motion it is simply there. */
+.process-line {
+  transform-origin: top;
+}
+
+@media (min-width: 64rem) {
+  .process-line {
+    transform-origin: left;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .process-line {
+    transition: transform 0.6s var(--ease-out-soft) var(--line-delay, 0ms);
+  }
+
+  .js [data-reveal]:not([data-revealed]) .process-line {
+    transform: scaleY(0);
+  }
+
+  @media (min-width: 64rem) {
+    .js [data-reveal]:not([data-revealed]) .process-line {
+      transform: scaleX(0);
+    }
+  }
+}
+
+/* ---------- Project panels ---------- */
+
+/* Diagonal cuts between the homepage project panels: stacked on phones, side
+   by side on large screens. Each panel is clipped to a slanted shape and
+   overlaps the one before by the cut, less a small gap, so the slants line up
+   with a thin line of the page background between them. */
+.project-panels {
+  --cut: 1.5rem;
+  --gap: 5px;
+}
+
+.project-panel {
+  clip-path: polygon(0 var(--cut), 100% 0, 100% calc(100% - var(--cut)), 0 100%);
+}
+
+.project-panel:first-child {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), 0 100%);
+}
+
+.project-panel:last-child {
+  clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%);
+}
+
+.project-panel + .project-panel {
+  margin-top: calc(var(--gap) - var(--cut));
+}
+
+@media (min-width: 64rem) {
+  .project-panels {
+    --cut: 5rem;
+    --gap: 6px;
+  }
+
+  .project-panel {
+    clip-path: polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+  }
+
+  .project-panel:first-child {
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+  }
+
+  .project-panel:last-child {
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .project-panel + .project-panel {
+    margin-top: 0;
+    margin-left: calc(var(--gap) - var(--cut));
+  }
+}
+
+/* ---------- Gallery project strips ---------- */
+
+/* The same diagonal cuts as the homepage panels, but always stacked: each strip
+   is clipped to a slanted band and overlaps the one before by the cut, less a
+   small gap, leaving a thin slanted line of the page between them. */
+.project-strips {
+  --cut: 1.25rem;
+  --gap: 5px;
+}
+
+@media (min-width: 64rem) {
+  .project-strips {
+    --cut: 2.5rem;
+    --gap: 6px;
+  }
+}
+
+.project-strip {
+  clip-path: polygon(0 var(--cut), 100% 0, 100% calc(100% - var(--cut)), 0 100%);
+}
+
+.project-strip:first-child {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), 0 100%);
+}
+
+.project-strip:last-child {
+  clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%);
+}
+
+.project-strip + .project-strip {
+  margin-top: calc(var(--gap) - var(--cut));
+}
+
+/* ---------- Textures ---------- */
+
+/* Faint profiled-sheet ribs used behind the closing call to action. */
+.profile-texture {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 34px,
+    color-mix(in srgb, var(--color-white) 5%, transparent) 34px 36px,
+    transparent 36px 40px,
+    color-mix(in srgb, var(--color-white) 3%, transparent) 40px 41px,
+    transparent 41px 72px
+  );
+  mask-image: linear-gradient(to left, #000, transparent 75%);
+}
