@@ -364,6 +364,53 @@
   }
 }
 
+/* ---------- Legal pages ---------- */
+
+/* Running text of the privacy policy and terms (components/legal/LegalPage.tsx),
+   so their sections can be written as plain paragraphs and lists. In the
+   components layer, so utility classes on an element still win. */
+@layer components {
+  .legal-text {
+    line-height: 1.7;
+    overflow-wrap: break-word;
+  }
+
+  .legal-text > * + * {
+    margin-top: 1rem;
+  }
+
+  .legal-text ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+
+  .legal-text li + li {
+    margin-top: 0.5rem;
+  }
+
+  .legal-text li::marker {
+    color: var(--color-deep-green);
+  }
+
+  .legal-text strong {
+    font-weight: 600;
+    color: var(--color-deep-base);
+  }
+
+  .legal-text a {
+    border-radius: 2px;
+    font-weight: 600;
+    color: var(--color-deep-green);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .legal-text a:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
 /* ---------- Project panels ---------- */
 
 /* Diagonal cuts between the homepage project panels: stacked on phones, side

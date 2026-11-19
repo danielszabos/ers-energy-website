@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { requestSurvey } from "@/app/contact/actions";
 import { buttonClasses } from "@/components/ui/ButtonLink";
@@ -245,6 +246,16 @@ export function SurveyQuestionnaire() {
         </div>
         <p aria-live="polite" className="sr-only">
           {pending ? "Sending your details" : ""}
+        </p>
+        <p className="mt-6 text-sm leading-relaxed text-mid-grey">
+          We&apos;ll use your details to reply to your request and arrange your survey. Our{" "}
+          <Link
+            href="/privacy-policy"
+            className="rounded-[2px] font-semibold text-deep-green underline underline-offset-4 hover:decoration-2"
+          >
+            privacy policy
+          </Link>{" "}
+          explains how we look after them.
         </p>
       </form>
     </div>
