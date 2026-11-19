@@ -41,7 +41,7 @@ export function Story() {
             {image ? (
               <Image
                 src={image}
-                alt="[Describe the story photo]"
+                alt="A trophy and two framed certificates from the 2020 North West Energy Efficiency Awards, presented to Environmental Roofing Services Ltd"
                 fill
                 sizes="(min-width: 80rem) 600px, (min-width: 64rem) 50vw, 100vw"
                 className="object-cover"

@@ -238,7 +238,8 @@ export const awards: {
   { result: "Winner", category: "Small Project (under £250K)", year: "2023", icon: "trophy" },
   { result: "Commended", category: "Large Project (over £250K)", year: "2023", icon: "star" },
   { result: "Winner", category: "Solar PV Installer and Contractor", year: "2020", icon: "trophy" },
-  { result: "Highly Commended", category: "Small Project of the Year", year: "2020", icon: "star" },
+  // 2020 names as printed on the certificates (photo: /public/about/story.jpg).
+  { result: "Highly Commended", category: "Small Scale Project (under £250K)", year: "2020", icon: "star" },
 ];
 
 export type FeaturedProject = {
