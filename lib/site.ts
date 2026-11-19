@@ -7,7 +7,21 @@ export const company = {
     display: "01942 368021",
     href: "tel:+441942368021",
   },
+  // The site has to show an email address (Electronic Commerce Regulations
+  // 2002). Also the address for data requests in the privacy policy.
+  email: {
+    display: "info@ersenergy.co.uk",
+    href: "mailto:info@ersenergy.co.uk",
+  },
+  /** Where ERS works from: shown in the footer and on the contact page. */
   address: ["Leigh Works", "Bradshawgate", "Leigh", "WN7 1AP"],
+  // From Companies House. The law requires the registered number and office on
+  // the website; the office is different from the trading address above.
+  companyNumber: "14604342",
+  registeredIn: "England and Wales",
+  registeredOffice: ["Office 27 Arrow Mill", "Queensway", "Rochdale", "OL11 2YW"],
+  // VAT-registered businesses must show the number on their website.
+  vatNumber: "GB 432 3224 37",
 } as const;
 
 export const navLinks = [
@@ -298,32 +312,68 @@ export const featuredProjects: FeaturedProject[] = [
       { value: "44", unit: "t", label: "CO₂ saved a year" },
     ],
   },
+  {
+    // From the gallery (lib/gallery.ts). The 280kW and the work are from ERS's
+    // own post; the problem and result are draft copy to check with ERS.
+    name: "Littlewood Farm",
+    location: "The Midlands",
+    problem:
+      "Large roofs across the farm's buildings sitting unused, while the farm bought in all the electricity it needed.",
+    work: "Designed and installed a 280kW solar array across the green profiled metal roofs of the farm's buildings, set out around the existing rooflights.",
+    result:
+      "Roofs that now generate electricity for the farm, cutting its energy costs and carbon emissions.",
+    image: "/projects/ERS Projects/Littlewood Farm Midlands 09.2023/2.png",
+    alt: "Solar panels across the roofs of green farm buildings, with polytunnels in the fields behind",
+    // Keeps the solar roofs in frame when the panel is narrow.
+    imagePosition: "5% 60%",
+    // 280 kWp is real. The panel count and CO₂ are SAMPLE estimates worked out
+    // from the array size: replace with the real numbers.
+    figures: [
+      { value: "280", unit: "kWp", label: "solar installed" },
+      { value: "640", unit: "panels", label: "fitted" },
+      { value: "49", unit: "t", label: "CO₂ saved a year" },
+    ],
+  },
 ];
 
 // Homepage testimonials, shown one at a time. Each string in `quote` is a paragraph.
+// All are real customer feedback, edited for length and to remove staff names
+// (the homeowner ones come from messages ERS shared on Facebook; surnames are
+// cut to an initial). Commercial reviews go first, as that's who ERS targets.
+// Roles describe the job, not the customer. Never reword a homeowner review to
+// read as a business one: that would be a fake review under the DMCC Act 2024.
+// `name` must be unique (it's used as the React key). Keep the first one short
+// enough (~250 characters) to show in full without "Read more", even on a phone.
 export const testimonials: { quote: string[]; name: string; role: string }[] = [
   {
     quote: [
-      "ERS Energy were patient during our decision-making process, no hard sell approach and subsequently installed solar panels and cladding at our Manchester business premises.",
-      "We found ERS excellent from the very beginning, offering knowledgeable advice and guidance supported with a realistic costing for the works we required. The project management and installation were both great and we've been impressed throughout the project including the final outcome, that delivered on time. The solar system comes with a very handy App which monitors performance, offering useful information including details of CO₂ savings, supporting our drive towards carbon neutrality.",
+      "No hard sell, just knowledgeable advice and a realistic costing. ERS were excellent from start to finish, and delivered solar panels and cladding at our Manchester premises on time. The app tracks our CO₂ savings as we work towards carbon neutrality.",
     ],
-    name: "Simon Hartley",
+    name: "Simon H.",
     role: "J Heebink, Trafford Park",
   },
-  // PLACEHOLDER reviews (layout preview only): replace with real customer
-  // reviews before the site goes live.
   {
     quote: [
-      "The team surveyed our roof with a drone, explained exactly what needed doing and gave us a clear, fair quote. The refurbishment was finished on schedule with minimal disruption to the business, and the site was left clean and tidy every day.",
+      "We've had a lot of interest from our neighbours, who have stood outside admiring the work and craftsmanship on the house.",
+      "Everyone we dealt with was excellent: informative, responsive to our requests and, importantly, true to their word. The installers were hard-working, highly skilled and trustworthy, and difficult things were always explained in a way that was easy to understand. The team represent the company really well.",
+      "We knew nothing about ERS beforehand, but we'll remember what it felt like working with them, and we'll be recommending them to others.",
     ],
-    name: "Michael Taylor",
-    role: "Business Owner",
+    name: "Homeowner",
+    role: "Solar PV installation",
   },
   {
     quote: [
-      "Professionalism, reliability, and excellence define ERS Energy Ltd's work. They transformed our roof with skill and precision, and their solar PV solutions are top-notch.",
+      "I've passed ERS's details on to our local environmental group, who are hoping to work with an installer and the community to increase the number of solar installations in our area.",
+      "I recommended ERS because of their swift, professional service and how happy we are with the whole installation, not least the iBoost, which means we're hardly using any gas at all. I tell everyone about it!",
     ],
-    name: "Olivia White",
-    role: "Property Manager",
+    name: "Claire M.",
+    role: "Solar PV & iBoost",
+  },
+  {
+    quote: [
+      "Last month I paid only about £10 for electricity, and £5 of that was the standing charge. This month should be even less, as the panels weren't in for the whole of last month. I let the house batteries charge up, then trickle-charge the car when it needs it.",
+    ],
+    name: "Anthony H.",
+    role: "Solar PV & battery storage",
   },
 ];
