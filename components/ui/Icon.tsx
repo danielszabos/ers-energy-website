@@ -113,6 +113,9 @@ const icons = {
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   close: <path d="m6 6 12 12M18 6 6 18" />,
   plus: <path d="M12 5v14M5 12h14" />,
+  minus: <path d="M5 12h14" />,
+  // Four corners: back to the whole view.
+  fit: <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />,
   pause: <path d="M9 6v12M15 6v12" />,
   play: <path d="M8 5.5v13l10-6.5-10-6.5Z" />,
   pin: (

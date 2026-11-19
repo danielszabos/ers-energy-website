@@ -421,6 +421,15 @@
   }
 }
 
+/* ---------- Project map ---------- */
+
+/* The About page map (components/about/ProjectMap.tsx) zooms by scaling its
+   outline, which would thicken the line too: this keeps it 1.5px. The
+   component sets --map-zoom. */
+.project-map-outline {
+  stroke-width: calc(1.5px / var(--map-zoom, 1));
+}
+
 /* ---------- Project panels ---------- */
 
 /* Diagonal cuts between the homepage project panels: stacked on phones, side
