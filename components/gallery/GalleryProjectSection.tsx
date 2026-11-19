@@ -13,9 +13,9 @@ export function GalleryProjectSection({ project }: { project: GalleryProject }) 
   const find = (file: string) => versionedPublicFile(`/projects/ERS Projects/${folder}/${file}`);
 
   const heroSrc = find(hero.file);
-  const found = photos.flatMap<ProjectPhoto>(({ file, ...photo }) => {
+  const found = photos.flatMap<ProjectPhoto>(({ file, alt, position }) => {
     const src = find(file);
-    return src ? [{ ...photo, src }] : [];
+    return src ? [{ src, alt, position }] : [];
   });
 
   return (

@@ -498,6 +498,15 @@
   }
 }
 
+/* Gallery strip text, from lg up: the usual page margin, but never closer
+   than 5.5rem to the screen edge, to leave room for the photo arrows at the
+   sides of an open project (components/gallery/GalleryStrip.tsx). */
+@media (min-width: 64rem) {
+  .project-strip-content {
+    padding-inline: max(2rem, calc(5.5rem - max(0px, (100vw - 80rem) / 2)));
+  }
+}
+
 .project-strip {
   clip-path: polygon(0 var(--cut), 100% 0, 100% calc(100% - var(--cut)), 0 100%);
 }

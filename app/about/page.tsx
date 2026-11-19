@@ -4,7 +4,7 @@ import { AboutAwards } from "@/components/about/AboutAwards";
 import { AboutHero } from "@/components/about/AboutHero";
 import { HowErsWorks } from "@/components/about/HowErsWorks";
 import { Story } from "@/components/about/Story";
-import { TalkToTeam } from "@/components/about/TalkToTeam";
+import { TalkToTeam } from "@/components/layout/TalkToTeam";
 import { WhereErsWorks } from "@/components/about/WhereErsWorks";
 
 export const metadata: Metadata = {
