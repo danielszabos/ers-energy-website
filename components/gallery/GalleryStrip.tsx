@@ -17,9 +17,24 @@ export type StripProject = Omit<GalleryProject, "hero" | "photos" | "folder"> & 
 /**
  * The shading over a strip's photos: deepest on the left, where the text sits,
  * and deeper again once the project is open. Every slide gets the same, so
- * they match (and the photos' soft detail doesn't show).
+ * they match (and the photos' soft detail doesn't show), except that on
+ * smaller screens the photo slides (`photo`), which have no text over them,
+ * get about half as much, so the photos can be seen.
  */
-function Shade({ open }: { open: boolean }) {
+function Shade({ open, photo = false }: { open: boolean; photo?: boolean }) {
+  if (photo) {
+    return (
+      <>
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-linear-to-r from-deep-base/50 via-deep-base/40 to-deep-base/30 lg:hidden"
+        />
+        <div className="absolute inset-0 max-lg:hidden">
+          <Shade open={open} />
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <div
@@ -281,7 +296,7 @@ export function GalleryStrip({ project }: { project: StripProject }) {
                   className="object-cover"
                   style={photo.position ? { objectPosition: photo.position } : undefined}
                 />
-                <Shade open />
+                <Shade open photo />
               </div>
             ))}
         </div>
