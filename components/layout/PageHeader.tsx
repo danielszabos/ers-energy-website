@@ -28,7 +28,6 @@ export function PageHeader({
   return (
     <section className="on-dark bg-deep-base pt-36 pb-16 text-white sm:pt-44 sm:pb-20">
       <Container>
-        <span aria-hidden="true" className="mb-6 block h-1 w-12 bg-brand-green" />
         <h1 className="text-4xl leading-tight font-bold tracking-[-0.015em] sm:text-5xl">
           {title}
         </h1>
