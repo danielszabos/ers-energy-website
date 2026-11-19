@@ -273,6 +273,16 @@
     opacity: 0;
     transform: translateY(1.5rem);
   }
+
+  /* Swipe rows (components/ui/SwipeRow.tsx) scroll sideways below sm. Only
+     the two cards in view reveal; the rest are already shown, so they don't
+     fade in halfway through a swipe. */
+  @media (max-width: 39.99rem) {
+    .js .swipe-row > li:nth-child(n + 3) [data-reveal]:not([data-revealed]) {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 /* ---------- Survey questionnaire ---------- */
