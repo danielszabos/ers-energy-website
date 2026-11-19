@@ -28,8 +28,8 @@ export function WhereErsWorks() {
           </SectionHeading>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75">
             From our home in Greater Manchester, ERS works on commercial and industrial buildings
-            across the UK. The map shows a few of the projects we&apos;ve completed over the last
-            decade.
+            across the UK. The map shows more than 100 of the projects we&apos;ve completed over the
+            last decade.
           </p>
           <ul aria-label="Map key" className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm text-white/75">
             <li className="flex items-center gap-3">
@@ -45,7 +45,15 @@ export function WhereErsWorks() {
 
         <Reveal delay={120} className="lg:col-span-5">
           <div className="mx-auto w-full max-w-[21rem] lg:max-w-[23rem]">
-            <ProjectMap places={places} aspectRatio={width / height}>
+            <ProjectMap
+              places={places}
+              aspectRatio={width / height}
+              // Starts a little zoomed in, so the big group around Greater
+              // Manchester has begun to split (about 75 to 80 projects in it),
+              // with the bottom of the map in view: all of England and Wales,
+              // Northern Ireland and most of Scotland.
+              start={{ k: 1.3, left: 48.8, top: 61.5 }}
+            >
               <svg
                 viewBox={`0 0 ${width} ${height}`}
                 aria-hidden="true"

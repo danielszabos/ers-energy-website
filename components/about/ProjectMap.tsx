@@ -43,6 +43,25 @@ const FLY_MS = 450;
 
 const clampZoom = (k: number) => Math.min(MAX_ZOOM, Math.max(1, k));
 
+/** Keeps a view within the map, so it can't be dragged away. */
+function clampView(next: View, width: number, height: number): View {
+  const k = clampZoom(next.k);
+  return {
+    k,
+    x: Math.min(0, Math.max(width * (1 - k), next.x)),
+    y: Math.min(0, Math.max(height * (1 - k), next.y)),
+  };
+}
+
+/** The view at zoom `k` with the map point (left%, top%) in the middle. */
+function centredView(k: number, left: number, top: number, width: number, height: number): View {
+  return clampView(
+    { k, x: width / 2 - (left / 100) * width * k, y: height / 2 - (top / 100) * height * k },
+    width,
+    height,
+  );
+}
+
 /**
  * Merges places whose circles would overlap at zoom `k`, so close neighbours
  * show as one numbered circle that splits apart as the map zooms in. A group
@@ -98,14 +117,24 @@ function groupPlaces(places: MapPlace[], k: number, width: number, height: numbe
 export function ProjectMap({
   places,
   aspectRatio,
+  start,
   children,
 }: {
   places: MapPlace[];
   /** Width divided by height. */
   aspectRatio: number;
+  /**
+   * Where the map starts: zoom `k` with the point (left%, top%) of the whole
+   * map in the middle, kept within the map. Without it, the whole UK shows.
+   */
+  start?: { k: number; left: number; top: number };
   children: ReactNode;
 }) {
-  const [view, setViewState] = useState<View>({ k: 1, x: 0, y: 0 });
+  const [view, setViewState] = useState<View>(() =>
+    start
+      ? centredView(start.k, start.left, start.top, DEFAULT_WIDTH, DEFAULT_WIDTH / aspectRatio)
+      : { k: 1, x: 0, y: 0 },
+  );
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [active, setActive] = useState<string | null>(null);
   const [hint, setHint] = useState<string | null>(null);
@@ -119,13 +148,7 @@ export function ProjectMap({
 
   /** Sets the view, kept within the map so it can't be dragged away. */
   const setView = useCallback((next: View) => {
-    const { width: w, height: h } = sizeRef.current;
-    const k = clampZoom(next.k);
-    const clamped = {
-      k,
-      x: Math.min(0, Math.max(w * (1 - k), next.x)),
-      y: Math.min(0, Math.max(h * (1 - k), next.y)),
-    };
+    const clamped = clampView(next, sizeRef.current.width, sizeRef.current.height);
     viewRef.current = clamped;
     setViewState(clamped);
   }, []);
