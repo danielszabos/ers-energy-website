@@ -9,14 +9,15 @@ const tones = {
   light: {
     size: 60,
     maxHeight: 64,
-    image: "",
+    image: "max-w-none",
     placeholder: "h-12 border-mid-grey/45 px-5 text-xs text-mid-grey",
   },
   // In the footer: small full-colour logos on light tiles so any artwork reads.
+  // A logo too wide for its tile shrinks to fit, keeping its shape.
   dark: {
     size: 32,
     maxHeight: 34,
-    image: "",
+    image: "max-w-full object-contain",
     placeholder: "h-7 border-white/25 px-3 text-[0.6875rem] text-white/65",
   },
 };
@@ -67,15 +68,18 @@ export function AccreditationLogo({
       height={height}
       loading="lazy"
       decoding="async"
-      className={cn("block max-w-none", image)}
+      className={cn("block", image)}
       style={{ height, width }}
     />
   );
 
   if (tone === "dark") {
-    // Equal-height tiles, whatever the logo's shape.
+    // Equal-size tiles, whatever the logo's shape: each fills its slot in the
+    // footer's grid.
     return (
-      <span className="inline-flex h-12 items-center rounded-[2px] bg-off-white px-3">{img}</span>
+      <span className="flex h-12 w-full items-center justify-center rounded-[2px] bg-off-white px-1.5">
+        {img}
+      </span>
     );
   }
   return img;

@@ -35,6 +35,15 @@ export default function ContactPage() {
               <span className="sr-only">Call </span>
               {company.phone.display}
             </ButtonLink>
+            <p className="mt-5 text-charcoal">
+              Or email{" "}
+              <a
+                href={company.email.href}
+                className="rounded-[2px] font-semibold text-deep-green underline-offset-4 hover:underline"
+              >
+                {company.email.display}
+              </a>
+            </p>
 
             <div className="mt-10 border-t border-border-grey pt-8">
               <h2 className="font-heading text-xs font-semibold tracking-[0.14em] text-deep-green uppercase">
