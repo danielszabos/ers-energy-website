@@ -59,6 +59,43 @@ export const galleryProjects: GalleryProject[] = [
     ],
   },
   {
+    id: "advanced-technologies",
+    name: "Advanced Technologies",
+    location: "Nelson",
+    folder: "Advanced Technologies Nelson",
+    figures: [
+      { value: "557", unit: "kW", label: "Solar array" },
+      { value: "4,500", unit: "m²", label: "Roof over-clad" },
+    ],
+    services: ["Roof over-cladding", "Solar PV", "EV charging", "LED lighting"],
+    categories: ["roofing", "solar"],
+    description: [
+      "A new roof and a 557kW solar array for Advanced Technologies in Nelson, along with six EV chargers and all-new LED lighting for the factory.",
+      "The ageing roof came first. ERS over-clad it, fitting 4,500m² of new roof sheets over the existing roof, and with that done, work began on the solar array.",
+      "The photos show the array going in: long rows of panels laid out across the new light-grey profiled roof, with edge protection around the roof and the team at work beyond.",
+    ],
+    hero: { file: "5.jpg", position: "50% 55%" },
+    photos: [
+      {
+        file: "1.jpg",
+        alt: "Rows of panels running along the new light-grey profiled roof",
+      },
+      {
+        file: "3.jpg",
+        alt: "An installer crossing the roof between rows of panels",
+        position: "50% 40%",
+      },
+      {
+        file: "2.jpg",
+        alt: "A block of panels on the new roof, with the cabling laid out beneath it",
+      },
+      {
+        file: "4.jpg",
+        alt: "Long rows of panels across the roof, with trees and fields beyond",
+      },
+    ],
+  },
+  {
     id: "trafford-bus-station",
     name: "Trafford Bus Station",
     location: "Trafford",
@@ -95,11 +132,11 @@ export const galleryProjects: GalleryProject[] = [
     name: "Caldeira Cushion Factory",
     location: "Knowsley",
     folder: "CALDEIRA CUSHION FACTORY",
-    figures: [{ value: "6,000", unit: "m", label: "Of roof" }],
+    figures: [{ value: "6,000", unit: "m²", label: "New roof" }],
     services: ["Commercial roofing"],
     categories: ["roofing"],
     description: [
-      "6,000m of new roof for the Caldeira cushion factory in Knowsley.",
+      "6,000m² of new roof for the Caldeira cushion factory in Knowsley.",
       "A crane lifted packs of new roof panels up to the team, and the new light-grey sheets went on in place of the old blue profiled roof, with edge protection along the working areas. Inside, netting was rigged beneath the roof while the work went on overhead.",
       "With the roof done, the plan was to move on to solar PV.",
     ],
@@ -146,6 +183,70 @@ export const galleryProjects: GalleryProject[] = [
     ],
   },
   {
+    id: "francos-bakery",
+    name: "Francos Bakery",
+    location: "Bolton",
+    folder: "Francos Bakery Bolton",
+    figures: [{ value: "1,800", unit: "m²", label: "Asbestos roof over-clad" }],
+    services: ["Asbestos roof over-cladding"],
+    categories: ["roofing"],
+    description: [
+      "1,800m² of asbestos roof over-clad at Francos Bakery in Bolton. Over-cladding fits a new roof over the old asbestos sheets, sealing them in place instead of stripping them off.",
+      "The photos show the new roof going on. Insulation was laid across the old corrugated sheets between spacer rails, and the new light-grey profiled sheets were fixed over the top, with safety netting and scaffolding in place while the team worked.",
+    ],
+    hero: { file: "4.jpg", position: "50% 40%" },
+    photos: [
+      {
+        file: "1.jpg",
+        alt: "New roof sheets alongside the old roof, with safety netting laid over the old sheets",
+      },
+      {
+        file: "2.jpg",
+        alt: "New sheets going on over insulation laid across the old asbestos roof",
+      },
+      {
+        file: "3.jpg",
+        alt: "A wide run of finished light-grey roof sheets",
+      },
+      {
+        file: "5.jpg",
+        alt: "Finished roof sheets running down the slope",
+      },
+    ],
+  },
+  {
+    id: "mears-carpets",
+    name: "Mears Carpets",
+    location: "Preston",
+    folder: "Mears Carpets Preston",
+    figures: [{ value: "100", unit: "kW", label: "Solar array" }],
+    services: ["Solar PV"],
+    categories: ["solar"],
+    description: [
+      "A 100kW solar array for Mears Carpets in Preston.",
+      "The photos were taken as the job neared completion, with the sun going down. Long rows of panels run along the profiled metal roof, with scaffolding around the roof edge and a boarded walkway beside the gutter.",
+    ],
+    hero: { file: "4.jpg", position: "50% 55%" },
+    photos: [
+      {
+        file: "1.jpg",
+        alt: "Sunset over the roof, with rows of panels behind the scaffold edge protection",
+      },
+      {
+        file: "5.jpg",
+        alt: "Rows of panels running the length of the roof beside the gutter",
+      },
+      {
+        file: "3.jpg",
+        alt: "The boarded scaffold walkway along the roof edge, beside the array",
+      },
+      {
+        file: "2.jpg",
+        alt: "Rows of panels beyond the edge protection, seen across the roof",
+      },
+    ],
+  },
+  {
     id: "pure-utilities",
     name: "Pure Utilities",
     location: "Preston",
@@ -171,6 +272,72 @@ export const galleryProjects: GalleryProject[] = [
       {
         file: "1.jpg",
         alt: "Breathable membrane and battens across the roof pitches",
+      },
+    ],
+  },
+  {
+    id: "middleton-bus-station",
+    name: "Middleton Bus Station",
+    location: "Middleton",
+    folder: "Middleton Bus Station",
+    figures: [
+      { value: "49.7", unit: "kW", label: "Solar array" },
+      { value: "10.6", unit: "kW", label: "Battery storage" },
+    ],
+    services: ["Solar PV", "Battery storage"],
+    categories: ["solar", "battery"],
+    description: [
+      "A 49.7kW solar array with a 10.6kW battery at Middleton Bus Station.",
+      "The photos show the electrical installation as the job neared completion. The inverter is mounted on the block wall above a row of isolators on steel trunking, beside a panel of meters, with the cabling running up the wall on cable tray towards the roof.",
+    ],
+    hero: { file: "4.jpg", position: "50% 50%" },
+    photos: [
+      {
+        file: "2.jpg",
+        alt: "The inverter and meter panel, with the cabling running up towards the roof",
+      },
+      {
+        file: "1.jpg",
+        alt: "The inverter above a row of isolators on steel trunking",
+      },
+      {
+        file: "3.jpg",
+        alt: "The steel trusses carrying the roof overhead",
+      },
+    ],
+  },
+  {
+    id: "tile-merchants",
+    name: "Tile Merchants",
+    location: "Astley, Greater Manchester",
+    folder: "Tile Merchants Astley",
+    figures: [
+      { value: "500", unit: "m", label: "Laps treated" },
+      { value: "5,000", label: "Fixings replaced" },
+    ],
+    services: ["Cut edge corrosion treatment", "Replacement fixings"],
+    categories: ["roofing"],
+    description: [
+      "Cut edge corrosion treatment to 500m of laps at Tile Merchants in Astley, along with 5,000 replacement fixings, to give the roof another 10 years of life.",
+      "Cut edge corrosion is rust that starts at the cut edges of metal roof sheets, where they overlap, and creeps back under the coating. Close up, the old laps were rusting and staining the roof around them. Each one was treated and sealed with a grey coating, which now runs in bands across the roof.",
+    ],
+    hero: { file: "4.jpg", position: "50% 50%" },
+    photos: [
+      {
+        file: "2.jpg",
+        alt: "Close-up of rusting cut edges where the roof sheets overlap",
+      },
+      {
+        file: "3.jpg",
+        alt: "A lap after treatment, sealed with a grey coating",
+      },
+      {
+        file: "5.jpg",
+        alt: "A treated lap running down the roof between the rooflights",
+      },
+      {
+        file: "1.jpg",
+        alt: "Looking across the roof, with rooflights set between the sheets",
       },
     ],
   },
@@ -249,6 +416,30 @@ export const galleryProjects: GalleryProject[] = [
       {
         file: "3.jpg",
         alt: "Cable tray carrying the wiring along the roof beside the panels",
+      },
+    ],
+  },
+  {
+    id: "grimsby-gutters",
+    name: "Gutter Replacement",
+    location: "Grimsby",
+    folder: "Grimsby Gutters",
+    figures: [{ value: "2", unit: "days", label: "To fit the new gutters" }],
+    services: ["Gutter replacement"],
+    categories: ["roofing"],
+    description: [
+      "All-new gutters for a building in Grimsby, fitted in two days. Other contractors had been coating the old gutters for years; ERS replaced them instead.",
+      "The gutters run between the building's roofs, with a curved roof on one side and a corrugated roof with rooflights on the other.",
+    ],
+    hero: { file: "3.jpg", position: "50% 55%" },
+    photos: [
+      {
+        file: "2.jpg",
+        alt: "Looking along a gutter between the curved roof and the corrugated roof, above the yard",
+      },
+      {
+        file: "1.jpg",
+        alt: "Sunlight reflected in the water along a gutter between two roofs",
       },
     ],
   },
