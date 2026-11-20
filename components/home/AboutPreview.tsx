@@ -27,8 +27,8 @@ export function AboutPreview() {
             The One Contractor Origin
           </SectionHeading>
           <p className="mt-5 leading-relaxed text-charcoal sm:text-lg sm:leading-relaxed">
-            ERS started out as Environmental Roofing Services, refurbishing commercial roofs
-            across the North West. Too often, solar systems built to last decades were going onto
+            ERS started out refurbishing commercial roofs across the North West. Too often, solar
+            systems built to last decades were going onto
             roofs near the end of their life. So ERS brought both services together under one
             roof. The result is one team, one point of contact, and solar that is built to last
             from the ground up.

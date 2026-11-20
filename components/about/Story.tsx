@@ -5,6 +5,8 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { versionedPublicFile } from "@/lib/assets";
 
+// The 2020 awards, with the company's old name blurred out at ERS's request
+// (the unedited photo is in source-assets/about/story-original.jpg).
 const IMAGE = "/about/story.jpg";
 
 export function Story() {
@@ -22,8 +24,8 @@ export function Story() {
           </SectionHeading>
           <div className="mt-6 space-y-5 leading-relaxed text-charcoal sm:text-lg sm:leading-relaxed">
             <p>
-              ERS started out as Environmental Roofing Services, refurbishing commercial roofs
-              across the North West. Over time, the team saw the same problem again and again.
+              ERS started out refurbishing commercial roofs across the North West. Over time, the
+              team saw the same problem again and again.
               Businesses were investing in solar systems built to last for decades, only for them
               to be fitted on roofs that were already nearing the end of their life.
             </p>
@@ -42,7 +44,7 @@ export function Story() {
             {image ? (
               <Image
                 src={image}
-                alt="A trophy and two framed certificates from the 2020 North West Energy Efficiency Awards, presented to Environmental Roofing Services Ltd"
+                alt="A trophy and two framed certificates from the 2020 North West Energy Efficiency Awards"
                 fill
                 sizes="(min-width: 80rem) 600px, (min-width: 64rem) 50vw, 100vw"
                 className="object-cover"
