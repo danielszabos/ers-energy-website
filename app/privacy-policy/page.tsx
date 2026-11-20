@@ -20,7 +20,7 @@ const UPDATED = "19 November 2026";
 // it with".
 
 const email = (
-  <a href={company.legalEmail.href}>{company.legalEmail.display}</a>
+  <a href={company.email.href}>{company.email.display}</a>
 );
 
 const sections: LegalSection[] = [
