@@ -164,7 +164,9 @@ export const services: Service[] = [
   },
 ];
 
-// Logo files live in /public/accreditations/{slug}.png (or .svg/.webp/.jpg).
+// Logo files live in /public/accreditations/{slug}.webp (or .svg/.png/.jpg).
+// They're lossless WebP: the same pixels as the PNGs they came from (kept in
+// source-assets/accreditations/web-png), at about two thirds of the size.
 // Logos are sized to equal area; `scale` nudges one that still looks too heavy
 // (solid shapes) or too light (thin outlines) next to the others.
 // `description` is the line under the logo on the About page; bodies without
