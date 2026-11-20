@@ -3,6 +3,7 @@ import { Inter, Montserrat } from "next/font/google";
 import { Logo } from "@/components/brand/Logo";
 import { Footer } from "@/components/layout/Footer";
 import { Nav } from "@/components/layout/Nav";
+import { isLaunched, siteUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -23,6 +24,8 @@ const inter = Inter({
 export const ensureStatic = "navigation";
 
 export const metadata: Metadata = {
+  // Makes the link-preview image (app/opengraph-image.jpg) a full web address.
+  metadataBase: siteUrl,
   title: {
     default: "ERS Energy | Commercial roofing and solar PV contractor",
     template: "%s | ERS Energy",
@@ -38,6 +41,9 @@ export const metadata: Metadata = {
     description:
       "Award-winning roof refurbishment, repairs and solar PV for industrial and commercial buildings across the UK.",
   },
+  twitter: { card: "summary_large_image" },
+  // Kept out of search results until the site is on its own domain (lib/siteUrl).
+  robots: isLaunched ? undefined : { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

@@ -7,7 +7,11 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { services } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Services" };
+export const metadata: Metadata = {
+  title: "Services",
+  description:
+    "Commercial roofing, solar PV, battery storage, cut edge corrosion treatment, gutter refurbishment and maintenance for commercial and industrial buildings.",
+};
 
 // Same grid and cards as the homepage's "What we do". Each card opens a window
 // with that service's details; the homepage cards link to /services#solar-pv etc.,
