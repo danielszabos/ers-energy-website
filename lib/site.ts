@@ -7,9 +7,15 @@ export const company = {
     display: "01942 368021",
     href: "tel:+441942368021",
   },
-  // The site has to show an email address (Electronic Commerce Regulations
-  // 2002). Also the address for data requests in the privacy policy.
+  // Enquiries about work go to the managing director: in the footer and on the
+  // contact page. (The site has to show an email address: Electronic Commerce
+  // Regulations 2002.)
   email: {
+    display: "clive.jones@ersenergy.co.uk",
+    href: "mailto:clive.jones@ersenergy.co.uk",
+  },
+  /** Anything not about work: questions about the privacy policy and terms, and data requests. */
+  legalEmail: {
     display: "info@ersenergy.co.uk",
     href: "mailto:info@ersenergy.co.uk",
   },

@@ -190,7 +190,7 @@ const sections: LegalSection[] = [
     body: (
       <p>
         If you have a question about these terms, email us at{" "}
-        <a href={company.email.href}>{company.email.display}</a> or call us on{" "}
+        <a href={company.legalEmail.href}>{company.legalEmail.display}</a> or call us on{" "}
         <a href={company.phone.href}>{company.phone.display}</a>.
       </p>
     ),
