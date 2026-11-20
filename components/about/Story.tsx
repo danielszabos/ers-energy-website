@@ -28,9 +28,10 @@ export function Story() {
               to be fitted on roofs that were already nearing the end of their life.
             </p>
             <p>
-              ERS brought both services together and became ERS Energy. With over 20 years in the
+              We brought both services together and became ERS Energy. With over 20 years in the
               trade, the team now works on commercial and industrial buildings across the UK from
-              its base in Leigh, making sure every building is ready before any solar goes on top.
+              its base in Greater Manchester, making sure every building is ready before any solar
+              goes on top.
             </p>
           </div>
         </Reveal>

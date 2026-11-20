@@ -9,7 +9,7 @@ export function AboutHero() {
       position="50% 22%"
       title="Why one contractor?"
     >
-      The story behind ERS Energy and the approach that sets it apart.
+      The story behind ERS Energy and the approach that sets us apart.
     </PageHero>
   );
 }

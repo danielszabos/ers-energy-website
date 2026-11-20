@@ -28,8 +28,8 @@ export function WhereErsWorks() {
           </SectionHeading>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75">
             From our home in Greater Manchester, ERS works on commercial and industrial buildings
-            across the UK. The map shows more than 100 of the projects we&apos;ve completed over the
-            last decade.
+            across the UK. The map shows more than 100 sites we&apos;ve worked on over the past
+            decade.
           </p>
           <ul aria-label="Map key" className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm text-white/75">
             <li className="flex items-center gap-3">

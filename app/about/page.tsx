@@ -9,7 +9,7 @@ import { WhereErsWorks } from "@/components/about/WhereErsWorks";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "The story behind ERS Energy and the approach that sets it apart.",
+  description: "The story behind ERS Energy and the approach that sets us apart.",
 };
 
 export default function AboutPage() {
