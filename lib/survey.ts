@@ -1,7 +1,17 @@
 // The contact page's survey request questionnaire: its steps, the choices in its
-// dropdowns and the checks on each answer. The form in the browser and the
-// server action both use these, so they always apply the same rules.
+// dropdowns and the checks on each answer. The form in the browser and the code
+// that receives it (lib/surveyRequest) both use these, so they always apply the
+// same rules.
 import { services } from "@/lib/site";
+
+/** What /api/survey answers: sent, or the answers it found a problem with. */
+export type SurveyResult = { ok: true } | { ok: false; errors?: SurveyErrors };
+
+/**
+ * A hidden box in the form that people never see, so never fill in. Automated
+ * spam fills in every box, and a request with this one filled in is dropped.
+ */
+export const SURVEY_TRAP_FIELD = "leave_blank";
 
 export type SurveyField =
   | "name"

@@ -9,15 +9,16 @@ export const metadata: Metadata = {
 };
 
 // Change this date whenever the policy changes.
-const UPDATED = "19 November 2026";
+const UPDATED = "22 November 2026";
 
-// Written from how the site works (the survey form's fields, no cookies or
-// analytics, Vercel hosting, Microsoft 365 email) and what ERS told us. The
-// retention periods, "no marketing" and the sharing for projects (network
-// operator, MCS) are commitments: ERS must keep to them, and this page must
-// change if they do something different. If the survey form starts sending
-// through another service (an email API or a CRM), add it under "Who we share
-// it with".
+// Written from how the site works (the survey form's fields, sent by email
+// through Resend; no cookies or analytics; Vercel hosting; Microsoft 365 email)
+// and what ERS told us. The retention periods, "no marketing" and the sharing
+// for projects (network operator, MCS) are commitments: ERS must keep to them,
+// and this page must change if they do something different. If the site moves
+// host (to Cloudflare, say) or the form starts sending through another service
+// (a CRM, say), change "Who we share it with" and "Information sent outside the
+// UK" to match.
 
 const email = (
   <a href={company.email.href}>{company.email.display}</a>
@@ -146,8 +147,9 @@ const sections: LegalSection[] = [
         <ul>
           <li>
             <strong>Service providers</strong> that handle it for us, and only on our
-            instructions: Microsoft, which provides our email (Microsoft 365), and Vercel, which
-            hosts our website.
+            instructions: Microsoft, which provides our email (Microsoft 365), Vercel, which
+            hosts our website, and Resend, which sends the emails from our website&apos;s survey
+            request form.
           </li>
           <li>
             <strong>Organisations your project needs</strong>, if you go ahead with work. For
@@ -168,8 +170,8 @@ const sections: LegalSection[] = [
     title: "Information sent outside the UK",
     body: (
       <p>
-        Vercel is based in the United States, and Microsoft may handle information outside the
-        UK. When information leaves the UK, it&apos;s protected in the ways UK data protection law
+        Vercel and Resend are based in the United States, and Microsoft may handle information
+        outside the UK. When information leaves the UK, it&apos;s protected in the ways UK data protection law
         requires, such as the UK&ndash;US &ldquo;data bridge&rdquo; or contract terms approved by
         the Information Commissioner&apos;s Office (ICO).
       </p>

@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
-import { requestSurvey } from "@/app/contact/actions";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/cn";
 import { company } from "@/lib/site";
 import {
+  SURVEY_TRAP_FIELD,
   allSurveyFields,
   emptySurvey,
   surveyFields,
@@ -16,9 +16,24 @@ import {
   validateSurvey,
   type SurveyErrors,
   type SurveyField,
+  type SurveyResult,
+  type SurveyValues,
 } from "@/lib/survey";
 
 type Control = HTMLInputElement | HTMLSelectElement;
+
+/**
+ * Sends the answers to /api/survey (lib/surveyRequest), which emails them to
+ * ERS and a confirmation to the customer. Throws if there's no usable answer.
+ */
+async function sendSurvey(values: SurveyValues, trap: string): Promise<SurveyResult> {
+  const response = await fetch("/api/survey", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...values, [SURVEY_TRAP_FIELD]: trap }),
+  });
+  return (await response.json()) as SurveyResult;
+}
 
 /** Scrolls the card's top back into view if it has gone up behind the nav. */
 function revealTop(element: HTMLElement | null) {
@@ -46,6 +61,7 @@ export function SurveyQuestionnaire() {
   const cardRef = useRef<HTMLDivElement>(null);
   const doneHeadingRef = useRef<HTMLHeadingElement>(null);
   const controls = useRef<Partial<Record<SurveyField, Control | null>>>({});
+  const trapRef = useRef<HTMLInputElement>(null);
   // The question to put the cursor in once the next step has rendered.
   const focusNext = useRef<SurveyField | null>(null);
 
@@ -108,7 +124,7 @@ export function SurveyQuestionnaire() {
     setSendFailed(false);
     startTransition(async () => {
       try {
-        const result = await requestSurvey(values);
+        const result = await sendSurvey(values, trapRef.current?.value ?? "");
         if (result.ok) {
           setSent(true);
           return;
@@ -201,6 +217,21 @@ export function SurveyQuestionnaire() {
             ))}
           </div>
         </fieldset>
+
+        {/* The spam trap (lib/survey): hidden from people, screen readers and the
+            Tab key, but there for anything that fills in every box. */}
+        <div aria-hidden="true" className="sr-only">
+          <label htmlFor="survey-trap">Leave this blank</label>
+          <input
+            ref={trapRef}
+            id="survey-trap"
+            name={SURVEY_TRAP_FIELD}
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            defaultValue=""
+          />
+        </div>
 
         {sendFailed && (
           <p
