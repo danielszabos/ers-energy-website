@@ -192,10 +192,16 @@ export const accreditations: {
       "Member of the Renewable Energy Consumer Code, protecting customers who buy renewable systems.",
   },
   {
-    slug: "hies",
-    name: "HIES",
-    scale: 0.92,
-    description: "Consumer code membership covering energy system installations.",
+    slug: "iso-9001",
+    name: "ISO 9001",
+    scale: 0.9,
+    description: "Quality management system registered to the international standard.",
+  },
+  {
+    slug: "iso-14001",
+    name: "ISO 14001",
+    scale: 0.9,
+    description: "Environmental management system registered to the international standard.",
   },
   { slug: "trading-standards", name: "Trading Standards Approved Code", scale: 1.06 },
   {
@@ -208,12 +214,6 @@ export const accreditations: {
     slug: "corc",
     name: "Confederation of Roofing Contractors",
     description: "Roofing trade association membership.",
-  },
-  {
-    slug: "chas",
-    name: "CHAS",
-    scale: 0.95,
-    description: "Health and safety assessment trusted by commercial clients.",
   },
   {
     slug: "safecontractor",

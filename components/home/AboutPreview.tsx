@@ -60,7 +60,7 @@ export function AboutPreview() {
             </div>
             {image && (
               <figcaption className="mt-3 text-sm leading-snug text-mid-grey">
-                Andy Burnham visiting the ERS team, 2022
+                Andy Burnham visiting the ERS team, 2023
               </figcaption>
             )}
           </figure>

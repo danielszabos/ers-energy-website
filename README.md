@@ -42,7 +42,7 @@ restart it to pick up new files.
 
 | File | Notes |
 | --- | --- |
-| `public/accreditations/{slug}.svg` | One per body; `.png`, `.webp` or `.jpg` also work. Slugs: `mcs`, `recc`, `hies`, `trading-standards`, `institute-of-roofing`, `corc`, `chas`, `safecontractor`, `constructionline`, `napit`. |
+| `public/accreditations/{slug}.svg` | One per body; `.png`, `.webp` or `.jpg` also work. Slugs: `mcs`, `recc`, `iso-9001`, `iso-14001`, `trading-standards`, `institute-of-roofing`, `corc`, `safecontractor`, `constructionline`, `napit`. |
 | `public/projects/project-1.jpg` … `project-3.jpg` | Recent projects cards, ideally 4:3 and at least 1200px wide. |
 | `public/about/hero.jpg` | About page hero, behind the heading (shaded dark). Landscape, at least 2000px wide. |
 | `public/about/story.jpg` | About page "Our story" photo, shown 4:3. Replace its alt text in `components/about/Story.tsx`. |

@@ -9,8 +9,8 @@ import { accreditations } from "@/lib/site";
 const order = [
   "mcs",
   "recc",
-  "hies",
-  "chas",
+  "iso-9001",
+  "iso-14001",
   "safecontractor",
   "constructionline",
   "institute-of-roofing",
