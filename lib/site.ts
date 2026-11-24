@@ -172,12 +172,34 @@ export const services: Service[] = [
 // (solid shapes) or too light (thin outlines) next to the others.
 // `description` is the line under the logo on the About page; bodies without
 // one are left off that page.
-export const accreditations: {
+type Accreditation = {
   slug: string;
   name: string;
   scale?: number;
   description?: string;
-}[] = [
+};
+
+// ERS is still getting ISO 9001 and 14001 (November 2026). A business can only
+// show an accreditation it already holds, so these logos stay off the site
+// until ERS has both certificates. Then set this to true.
+const SHOW_ISO = false;
+
+const iso: Accreditation[] = [
+  {
+    slug: "iso-9001",
+    name: "ISO 9001",
+    scale: 0.9,
+    description: "Quality management system registered to the international standard.",
+  },
+  {
+    slug: "iso-14001",
+    name: "ISO 14001",
+    scale: 0.9,
+    description: "Environmental management system registered to the international standard.",
+  },
+];
+
+export const accreditations: Accreditation[] = [
   {
     slug: "mcs",
     name: "MCS",
@@ -191,18 +213,7 @@ export const accreditations: {
     description:
       "Member of the Renewable Energy Consumer Code, protecting customers who buy renewable systems.",
   },
-  {
-    slug: "iso-9001",
-    name: "ISO 9001",
-    scale: 0.9,
-    description: "Quality management system registered to the international standard.",
-  },
-  {
-    slug: "iso-14001",
-    name: "ISO 14001",
-    scale: 0.9,
-    description: "Environmental management system registered to the international standard.",
-  },
+  ...(SHOW_ISO ? iso : []),
   { slug: "trading-standards", name: "Trading Standards Approved Code", scale: 1.06 },
   {
     slug: "institute-of-roofing",

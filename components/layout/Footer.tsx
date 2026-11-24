@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { AccreditationLogo } from "@/components/brand/AccreditationLogo";
 import { Logo } from "@/components/brand/Logo";
 import { Container } from "@/components/ui/Container";
@@ -83,9 +84,17 @@ export function Footer() {
           <h2 id="footer-accreditations" className={headingClass}>
             Accredited and approved
           </h2>
+          {/* Two even rows on phones, one row from md up, however many logos
+              there are. */}
           <ul
             aria-labelledby="footer-accreditations"
-            className="grid grid-cols-5 gap-2 md:grid-cols-10 xl:grid-cols-[repeat(10,4.5rem)]"
+            className="grid grid-cols-[repeat(var(--half),minmax(0,1fr))] gap-2 md:grid-cols-[repeat(var(--all),minmax(0,1fr))] xl:grid-cols-[repeat(var(--all),4.5rem)]"
+            style={
+              {
+                "--all": accreditations.length,
+                "--half": Math.ceil(accreditations.length / 2),
+              } as CSSProperties
+            }
           >
             {accreditations.map((item) => (
               <li key={item.slug}>
