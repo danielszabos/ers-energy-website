@@ -152,8 +152,19 @@ function requestEmail(r: SurveyValues, received: string, site: string) {
     })
     .join("");
 
+  // What it's about at a glance, for the inbox's preview line.
+  const preview = [
+    r.name,
+    r.preferredContact && `prefers ${r.preferredContact.toLowerCase()}`,
+    r.service,
+    r.property,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   const html = layout(
     "New survey request",
+    preview,
     `<p style="margin:0 0 16px;">A survey request has come in through the website.</p>
      <table role="presentation" style="border-collapse:collapse;font-size:15px;">${tableRows}</table>
      <p style="margin:20px 0 0;color:#5f6661;font-size:13px;">Received ${escapeHtml(received)}</p>
@@ -213,6 +224,7 @@ function confirmationEmail(r: SurveyValues, site: string) {
 
   const html = layout(
     "We've received your survey request",
+    `Thanks${first ? ` ${first}` : ""}, we'll ${contactPromise(r.preferredContact)} soon to arrange your survey.`,
     `<p style="margin:0 0 16px;">${escapeHtml(greeting)}</p>
      <p style="margin:0 0 16px;">${escapeHtml(thanks)}</p>
      <table role="presentation" style="border-collapse:collapse;font-size:15px;margin:0 0 16px;">${summary
@@ -271,11 +283,17 @@ function firstName(name: string): string | null {
  * picture has the band's colour behind the logo, so the white lettering stays
  * readable in apps that recolour emails in dark mode (they never recolour
  * pictures).
+ *
+ * `preview` is the line inbox lists show under the subject. It's hidden in the
+ * email itself, and followed by a run of invisible characters so inbox apps
+ * don't fill the rest of the line with the start of the email.
  */
-function layout(heading: string, body: string, site: string) {
+function layout(heading: string, preview: string, body: string, site: string) {
   const details = `${company.name}. Registered in ${company.registeredIn}, company number ${company.companyNumber}. Registered office: ${company.registeredOffice.join(", ")}.`;
   const logo = new URL("/email/ers-logo.png", site).href;
+  const filler = "&#847;&zwnj;&nbsp;&#8199;&shy;".repeat(60);
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f3;">
+<div style="display:none;max-height:0;max-width:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#f4f5f3;opacity:0;">${escapeHtml(preview)}${filler}</div>
 <table role="presentation" width="100%" style="border-collapse:collapse;background:#f4f5f3;"><tr><td style="padding:24px 12px;">
 <table role="presentation" width="100%" style="max-width:560px;margin:0 auto;border-collapse:collapse;background:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1e2420;">
 <tr><td bgcolor="#1e2420" style="background:#1e2420;padding:10px 20px;"><a href="${escapeHtml(site)}" style="text-decoration:none;"><img src="${escapeHtml(logo)}" width="156" height="79" alt="ERS Energy" style="display:block;width:156px;height:79px;border:0;outline:none;text-decoration:none;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;line-height:79px;"></a></td></tr>
