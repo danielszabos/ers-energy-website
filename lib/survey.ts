@@ -18,6 +18,7 @@ export type SurveyField =
   | "business"
   | "email"
   | "phone"
+  | "preferredContact"
   | "postcode"
   | "service"
   | "property";
@@ -34,7 +35,7 @@ export const surveySteps: { title: string; intro: string; fields: SurveyField[] 
   {
     title: "Contact",
     intro: "How should we get in touch to arrange your survey?",
-    fields: ["email", "phone"],
+    fields: ["email", "phone", "preferredContact"],
   },
   {
     title: "The Service",
@@ -59,14 +60,30 @@ export const propertyOptions: readonly string[] = [
   "Other",
 ];
 
+/**
+ * How the customer is told ERS will get back to them ("Someone from the team
+ * will ___ soon"), going by the contact method they chose, if any.
+ */
+export function contactPromise(preferredContact: string) {
+  if (preferredContact === "Phone") return "call you";
+  if (preferredContact === "Email") return "email you";
+  return "be in touch";
+}
+
 type FieldConfig = { label: string; hint?: string; missing: string } & (
   | {
       type: "text" | "email" | "tel";
       autoComplete: string;
       maxLength: number;
       uppercase?: boolean;
+      /** Shows a "Preferred" switch by this box, which sets preferredContact to this. */
+      preference?: string;
     }
   | { type: "select"; options: readonly string[]; placeholder: string }
+  // Not a question of its own: set by the "Preferred" switches beside the boxes
+  // whose `preference` is one of these options. Empty means no preference, so
+  // `missing` is only for an answer that isn't one of the options.
+  | { type: "preference"; options: readonly string[] }
 );
 
 export const surveyFields: Record<SurveyField, FieldConfig> = {
@@ -89,6 +106,7 @@ export const surveyFields: Record<SurveyField, FieldConfig> = {
     type: "email",
     autoComplete: "email",
     maxLength: 254,
+    preference: "Email",
     missing: "Enter your email address",
   },
   phone: {
@@ -96,7 +114,14 @@ export const surveyFields: Record<SurveyField, FieldConfig> = {
     type: "tel",
     autoComplete: "tel",
     maxLength: 30,
+    preference: "Phone",
     missing: "Enter your phone number",
+  },
+  preferredContact: {
+    label: "Preferred contact",
+    type: "preference",
+    options: ["Email", "Phone"],
+    missing: "Choose email or phone, or neither",
   },
   postcode: {
     label: "Site postcode",
@@ -130,6 +155,7 @@ export const emptySurvey: SurveyValues = {
   business: "",
   email: "",
   phone: "",
+  preferredContact: "",
   postcode: "",
   service: "",
   property: "",
@@ -147,6 +173,9 @@ export function validateField(field: SurveyField, raw: string): string | undefin
 
   if (config.type === "select") {
     return config.options.includes(value) ? undefined : config.missing;
+  }
+  if (config.type === "preference") {
+    return !value || config.options.includes(value) ? undefined : config.missing;
   }
   if (!value) return config.missing;
   if (value.length > config.maxLength) {

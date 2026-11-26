@@ -60,7 +60,10 @@ const sections: LegalSection[] = [
         </p>
         <ul>
           <li>your name and the name of your business</li>
-          <li>your email address and phone number</li>
+          <li>
+            your email address and phone number, and how you&apos;d prefer us to contact you
+            (if you tell us)
+          </li>
           <li>the postcode of the building the work is for</li>
           <li>the service you need and the type of property</li>
         </ul>

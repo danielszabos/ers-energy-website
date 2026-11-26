@@ -3,7 +3,7 @@
 // Resend (resend.com) with nothing but fetch, so the same code runs on Vercel,
 // in local development and in a Cloudflare Worker.
 import { company } from "@/lib/site";
-import type { SurveyValues } from "@/lib/survey";
+import { contactPromise, type SurveyValues } from "@/lib/survey";
 
 export type SurveyEmailSettings = {
   apiKey: string;
@@ -110,12 +110,24 @@ async function send(settings: SurveyEmailSettings, email: Email) {
 
 // The request, for ERS. Everything the visitor typed is escaped before it goes
 // into the HTML.
+//
+// It ends with buttons to email or call the customer, the way they'd prefer
+// filled in green (both, if they didn't say). The email one starts a new email
+// rather than a reply, so the customer doesn't get this request quoted back to
+// them. Replying still reaches the customer too (Reply-To).
 function requestEmail(r: SurveyValues, received: string, site: string) {
+  // The characters that start a subject, a copy to someone else or any other
+  // extra in a mailto link are encoded, so an odd address can't add any.
+  const address = r.email.replace(/[%?#&]/g, (character) => encodeURIComponent(character));
+  const emailHref = `mailto:${address}?subject=${encodeURIComponent(`Your survey request with ${company.shortName}`)}`;
+  const phoneHref = `tel:${r.phone.replace(/[^\d+]/g, "")}`;
+
   const rows: [label: string, value: string, href?: string][] = [
     ["Name", r.name],
     ["Business", r.business],
-    ["Email", r.email, `mailto:${r.email}`],
-    ["Phone", r.phone, `tel:${r.phone.replace(/[^\d+]/g, "")}`],
+    ["Email", r.email, emailHref],
+    ["Phone", r.phone, phoneHref],
+    ["Preferred contact", r.preferredContact || "No preference given"],
     ["Site postcode", r.postcode],
     ["Service", r.service],
     ["Property type", r.property],
@@ -127,8 +139,6 @@ function requestEmail(r: SurveyValues, received: string, site: string) {
     ...rows.map(([label, value]) => `${label}: ${value}`),
     "",
     `Received: ${received}`,
-    "",
-    `Reply to this email to answer ${r.name} directly.`,
   ].join("\n");
 
   const tableRows = rows
@@ -136,7 +146,9 @@ function requestEmail(r: SurveyValues, received: string, site: string) {
       const shown = href
         ? `<a href="${escapeHtml(href)}" style="color:#3f7a1f;">${escapeHtml(value)}</a>`
         : escapeHtml(value);
-      return `<tr><td style="padding:8px 16px 8px 0;color:#5f6661;white-space:nowrap;vertical-align:top;">${label}</td><td style="padding:8px 0;color:#1e2420;font-weight:600;">${shown}</td></tr>`;
+      // Long values (an email address, mostly) may break onto a second line,
+      // so the table never pushes the email wider than a phone screen.
+      return `<tr><td style="padding:8px 16px 8px 0;color:#5f6661;vertical-align:top;">${label}</td><td style="padding:8px 0;color:#1e2420;font-weight:600;vertical-align:top;overflow-wrap:anywhere;word-break:break-word;">${shown}</td></tr>`;
     })
     .join("");
 
@@ -145,19 +157,35 @@ function requestEmail(r: SurveyValues, received: string, site: string) {
     `<p style="margin:0 0 16px;">A survey request has come in through the website.</p>
      <table role="presentation" style="border-collapse:collapse;font-size:15px;">${tableRows}</table>
      <p style="margin:20px 0 0;color:#5f6661;font-size:13px;">Received ${escapeHtml(received)}</p>
-     <p style="margin:16px 0 0;">Reply to this email to answer ${escapeHtml(r.name)} directly.</p>`,
+     <table role="presentation" width="100%" style="border-collapse:collapse;margin:24px 0 0;"><tr>
+       <td width="50%" style="width:50%;padding:0 5px 0 0;vertical-align:top;">${button(emailHref, "Email", r.preferredContact !== "Phone")}</td>
+       <td width="50%" style="width:50%;padding:0 0 0 5px;vertical-align:top;">${button(phoneHref, "Call", r.preferredContact !== "Email")}</td>
+     </tr></table>`,
     site,
   );
 
   return { subject: `Survey request: ${r.business} (${r.postcode})`, text, html };
 }
 
+/**
+ * A button that fills its half of the row, filled green or outlined, and works
+ * across email apps: the colour and outline are on a table cell, which every
+ * app draws, with the padding on the link for most apps and on the cell for
+ * Outlook on a PC (mso-padding-alt), which ignores padding on links. Outlook
+ * on a PC also shows it square rather than rounded.
+ */
+function button(href: string, label: string, filled: boolean) {
+  const colour = filled ? "#8cc63e" : "#ffffff";
+  const border = filled ? "#8cc63e" : "#1e2420";
+  return `<table role="presentation" width="100%" style="border-collapse:separate;"><tr><td align="center" bgcolor="${colour}" style="background:${colour};border:2px solid ${border};border-radius:999px;mso-padding-alt:11px 12px;"><a href="${escapeHtml(href)}" style="display:block;padding:11px 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;line-height:20px;color:#1e2420;text-align:center;text-decoration:none;">${escapeHtml(label)}</a></td></tr></table>`;
+}
+
 // The customer's confirmation. It goes to whatever address was typed into the
 // form, so it only repeats answers that can't carry a message of their own:
 // ones picked from a list or checked against a strict format (service,
-// property type, postcode), and the first name only when firstName below
-// accepts it. Otherwise anyone could use the form to send their own words from
-// ERS's address to someone else.
+// property type, postcode, contact method), and the first name only when
+// firstName below accepts it. Otherwise anyone could use the form to send their
+// own words from ERS's address to someone else.
 function confirmationEmail(r: SurveyValues, site: string) {
   const summary: [string, string][] = [
     ["Service", r.service],
@@ -166,16 +194,17 @@ function confirmationEmail(r: SurveyValues, site: string) {
   ];
   const first = firstName(r.name);
   const greeting = first ? `Hello ${first},` : "Hello,";
+  const thanks = `Thanks for getting in touch with ${company.shortName}. We've received your request for a survey, and someone from the team will ${contactPromise(r.preferredContact)} soon to arrange it.`;
 
   const text = [
     greeting,
     "",
-    `Thanks for getting in touch with ${company.shortName}. We've received your request for a survey, and someone from the team will be in touch soon to arrange it.`,
+    thanks,
     "",
     "Your request",
     ...summary.map(([label, value]) => `${label}: ${value}`),
     "",
-    `If it's urgent, call us on ${company.phone.display}, or reply to this email.`,
+    `If it's urgent, call us on ${company.phone.display}.`,
     "",
     company.shortName,
     "",
@@ -185,14 +214,14 @@ function confirmationEmail(r: SurveyValues, site: string) {
   const html = layout(
     "We've received your survey request",
     `<p style="margin:0 0 16px;">${escapeHtml(greeting)}</p>
-     <p style="margin:0 0 16px;">Thanks for getting in touch with ${company.shortName}. We've received your request for a survey, and someone from the team will be in touch soon to arrange it.</p>
+     <p style="margin:0 0 16px;">${escapeHtml(thanks)}</p>
      <table role="presentation" style="border-collapse:collapse;font-size:15px;margin:0 0 16px;">${summary
        .map(
          ([label, value]) =>
            `<tr><td style="padding:6px 16px 6px 0;color:#5f6661;">${label}</td><td style="padding:6px 0;color:#1e2420;font-weight:600;">${escapeHtml(value)}</td></tr>`,
        )
        .join("")}</table>
-     <p style="margin:0 0 16px;">If it's urgent, call us on <a href="${company.phone.href}" style="color:#3f7a1f;font-weight:600;">${company.phone.display}</a>, or reply to this email.</p>
+     <p style="margin:0 0 16px;">If it's urgent, call us on <a href="${company.phone.href}" style="color:#3f7a1f;font-weight:600;">${company.phone.display}</a>.</p>
      <p style="margin:0;">${company.shortName}</p>
      <p style="margin:24px 0 0;color:#5f6661;font-size:13px;">You're getting this email because this address was used to request a survey on our website. If that wasn't you, you can ignore it.</p>`,
     site,

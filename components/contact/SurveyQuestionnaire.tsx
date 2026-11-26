@@ -9,6 +9,7 @@ import { company } from "@/lib/site";
 import {
   SURVEY_TRAP_FIELD,
   allSurveyFields,
+  contactPromise,
   emptySurvey,
   surveyFields,
   surveySteps,
@@ -161,7 +162,8 @@ export function SurveyQuestionnaire() {
           Thanks, we&apos;ve got your details
         </h2>
         <p className="mt-4 max-w-lg leading-relaxed text-charcoal sm:text-lg sm:leading-relaxed">
-          Someone from the team will be in touch soon to arrange your survey. If it&apos;s
+          Someone from the team will {contactPromise(values.preferredContact)} soon to arrange
+          your survey. If it&apos;s
           urgent, call us on{" "}
           <a
             href={company.phone.href}
@@ -203,18 +205,24 @@ export function SurveyQuestionnaire() {
           <p className="mt-3 leading-relaxed text-charcoal">{current.intro}</p>
 
           <div className="mt-8 space-y-6">
-            {current.fields.map((field) => (
-              <Question
-                key={field}
-                field={field}
-                value={values[field]}
-                error={errors[field]}
-                onChange={(value) => update(field, value)}
-                controlRef={(element) => {
-                  controls.current[field] = element;
-                }}
-              />
-            ))}
+            {/* The preferred contact has no question of its own: it's set by the
+                "Preferred" switches by the email and phone boxes. */}
+            {current.fields
+              .filter((field) => surveyFields[field].type !== "preference")
+              .map((field) => (
+                <Question
+                  key={field}
+                  field={field}
+                  value={values[field]}
+                  error={errors[field]}
+                  onChange={(value) => update(field, value)}
+                  controlRef={(element) => {
+                    controls.current[field] = element;
+                  }}
+                  preferredContact={values.preferredContact}
+                  onPreferredContactChange={(value) => update("preferredContact", value)}
+                />
+              ))}
           </div>
         </fieldset>
 
@@ -299,17 +307,24 @@ function Question({
   error,
   onChange,
   controlRef,
+  preferredContact,
+  onPreferredContactChange,
 }: {
   field: SurveyField;
   value: string;
   error?: string;
   onChange: (value: string) => void;
   controlRef: (element: Control | null) => void;
+  preferredContact: string;
+  onPreferredContactChange: (value: string) => void;
 }) {
   const config = surveyFields[field];
+  if (config.type === "preference") return null;
   const id = `survey-${field}`;
   const hintId = config.hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
+  const preference = "preference" in config ? config.preference : undefined;
+  const preferred = preference !== undefined && preferredContact === preference;
   const shared = {
     id,
     value,
@@ -324,17 +339,22 @@ function Question({
   );
 
   return (
-    <div>
-      <label htmlFor={id} className="block font-heading text-[0.9375rem] font-semibold text-deep-base">
+    // A grid, so a "Preferred" switch can sit at the end of the label's line
+    // while still coming straight after its box when moving through with Tab.
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4">
+      <label
+        htmlFor={id}
+        className="col-start-1 row-start-1 block font-heading text-[0.9375rem] font-semibold text-deep-base"
+      >
         {config.label}
       </label>
       {config.hint && (
-        <p id={hintId} className="mt-1 text-sm text-mid-grey">
+        <p id={hintId} className="col-span-2 mt-1 text-sm text-mid-grey">
           {config.hint}
         </p>
       )}
 
-      <div className="relative mt-2">
+      <div className="relative col-span-2 mt-2">
         {config.type === "select" ? (
           <>
             <select
@@ -376,8 +396,39 @@ function Question({
         )}
       </div>
 
+      {/* Marks this as the way they'd prefer to be contacted. Pressing it again
+          clears it, and pressing the other one moves it there, so at most one
+          is on; neither means no preference. */}
+      {preference !== undefined && (
+        <button
+          type="button"
+          aria-pressed={preferred}
+          onClick={() => onPreferredContactChange(preferred ? "" : preference)}
+          className={cn(
+            "group col-start-2 row-start-1 -my-1 inline-flex items-center gap-2 rounded-[2px] py-1 text-sm font-medium transition-colors duration-150",
+            preferred ? "text-deep-green" : "text-charcoal hover:text-deep-base",
+          )}
+        >
+          <span
+            aria-hidden="true"
+            className={cn(
+              "flex size-[1.125rem] shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-150",
+              preferred ? "border-deep-green" : "border-mid-grey group-hover:border-charcoal",
+            )}
+          >
+            <span
+              className={cn(
+                "size-2 rounded-full bg-deep-green transition-transform duration-150",
+                preferred ? "scale-100" : "scale-0",
+              )}
+            />
+          </span>
+          Preferred<span className="sr-only"> ({config.label.toLowerCase()})</span>
+        </button>
+      )}
+
       {error && (
-        <p id={errorId} className="mt-2 text-sm font-medium text-error">
+        <p id={errorId} className="col-span-2 mt-2 text-sm font-medium text-error">
           <span className="sr-only">Error: </span>
           {error}
         </p>

@@ -12,7 +12,7 @@ import {
 } from "@/lib/survey";
 import { sendSurveyEmails, surveyEmailSettings } from "@/lib/surveyEmail";
 
-// Far more than seven short answers need: anything bigger isn't the form.
+// Far more than eight short answers need: anything bigger isn't the form.
 const MAX_BODY = 10_000;
 
 export async function handleSurveyPost(
