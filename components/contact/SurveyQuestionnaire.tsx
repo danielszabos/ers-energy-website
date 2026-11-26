@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition, type FormEvent } from "reac
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/cn";
+import { suggestEmail } from "@/lib/emailAddress";
 import { company } from "@/lib/site";
 import {
   SURVEY_TRAP_FIELD,
@@ -26,14 +27,38 @@ type Control = HTMLInputElement | HTMLSelectElement;
 /**
  * Sends the answers to /api/survey (lib/surveyRequest), which emails them to
  * ERS and a confirmation to the customer. Throws if there's no usable answer.
+ * `postcodeConfirmed` once the visitor has said an unlisted postcode is right.
  */
-async function sendSurvey(values: SurveyValues, trap: string): Promise<SurveyResult> {
+async function sendSurvey(
+  values: SurveyValues,
+  trap: string,
+  postcodeConfirmed: boolean,
+): Promise<SurveyResult> {
   const response = await fetch("/api/survey", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...values, [SURVEY_TRAP_FIELD]: trap }),
+    body: JSON.stringify({ ...values, [SURVEY_TRAP_FIELD]: trap, postcodeConfirmed }),
   });
   return (await response.json()) as SurveyResult;
+}
+
+/**
+ * Asks /api/survey/email whether the email address's domain exists (only the
+ * server can look that up): the problem to show, or undefined if it's fine or
+ * the check couldn't be made. The server checks again when the form is sent.
+ */
+async function checkEmail(email: string): Promise<string | undefined> {
+  try {
+    const response = await fetch("/api/survey/email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const result = (await response.json()) as SurveyResult;
+    return result.ok ? undefined : result.errors?.email;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Scrolls the card's top back into view if it has gone up behind the nav. */
@@ -57,8 +82,13 @@ export function SurveyQuestionnaire() {
   const [errors, setErrors] = useState<SurveyErrors>({});
   const [sent, setSent] = useState(false);
   const [sendFailed, setSendFailed] = useState(false);
+  // The postcode isn't on the official list but its district is real: offer
+  // to send it anyway, as a new building's postcode may not be listed yet.
+  const [offerPostcode, setOfferPostcode] = useState(false);
+  const postcodeConfirmed = useRef(false);
   const [pending, startTransition] = useTransition();
 
+  const formRef = useRef<HTMLFormElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const doneHeadingRef = useRef<HTMLHeadingElement>(null);
   const controls = useRef<Partial<Record<SurveyField, Control | null>>>({});
@@ -95,6 +125,10 @@ export function SurveyQuestionnaire() {
 
   function update(field: SurveyField, value: string) {
     setValues((previous) => ({ ...previous, [field]: value }));
+    if (field === "postcode") {
+      setOfferPostcode(false);
+      postcodeConfirmed.current = false;
+    }
     // Once a problem is showing, clear it as soon as the answer is fixed.
     if (errors[field]) {
       setErrors((previous) => ({ ...previous, [field]: validateField(field, value) }));
@@ -117,6 +151,20 @@ export function SurveyQuestionnaire() {
       return;
     }
 
+    if (!isLast && current.fields.includes("email")) {
+      // Before leaving the Contact step, make sure the email's domain exists.
+      startTransition(async () => {
+        const problem = await checkEmail(values.email);
+        if (problem) {
+          setErrors((previous) => ({ ...previous, email: problem }));
+          controls.current.email?.focus();
+          return;
+        }
+        goTo(step + 1, surveySteps[step + 1].fields[0]);
+      });
+      return;
+    }
+
     if (!isLast) {
       goTo(step + 1, surveySteps[step + 1].fields[0]);
       return;
@@ -125,7 +173,11 @@ export function SurveyQuestionnaire() {
     setSendFailed(false);
     startTransition(async () => {
       try {
-        const result = await sendSurvey(values, trapRef.current?.value ?? "");
+        const result = await sendSurvey(
+          values,
+          trapRef.current?.value ?? "",
+          postcodeConfirmed.current,
+        );
         if (result.ok) {
           setSent(true);
           return;
@@ -138,6 +190,7 @@ export function SurveyQuestionnaire() {
           return;
         }
         setErrors(serverErrors);
+        setOfferPostcode(field === "postcode" && result.confirmPostcode === true);
         goTo(
           surveySteps.findIndex((s) => s.fields.includes(field)),
           field,
@@ -191,7 +244,13 @@ export function SurveyQuestionnaire() {
         ))}
       </div>
 
-      <form noValidate onSubmit={handleSubmit} aria-label="Request a survey" className="mt-8">
+      <form
+        ref={formRef}
+        noValidate
+        onSubmit={handleSubmit}
+        aria-label="Request a survey"
+        className="mt-8"
+      >
         <fieldset key={step} data-direction={direction} className="survey-step min-w-0">
           {/* Read out with each question, so "Step 2 of 3, Contact" is announced too. */}
           <legend className="w-full">
@@ -221,6 +280,19 @@ export function SurveyQuestionnaire() {
                   }}
                   preferredContact={values.preferredContact}
                   onPreferredContactChange={(value) => update("preferredContact", value)}
+                  errorAction={
+                    field === "postcode" && offerPostcode
+                      ? {
+                          label: "Send with this postcode",
+                          onClick: () => {
+                            postcodeConfirmed.current = true;
+                            setOfferPostcode(false);
+                            setErrors((previous) => ({ ...previous, postcode: undefined }));
+                            formRef.current?.requestSubmit();
+                          },
+                        }
+                      : undefined
+                  }
                 />
               ))}
           </div>
@@ -279,12 +351,12 @@ export function SurveyQuestionnaire() {
             disabled={pending}
             className={buttonClasses({ className: "disabled:cursor-wait disabled:opacity-70" })}
           >
-            {pending ? "Sending…" : isLast ? "Request a survey" : "Continue"}
+            {pending ? (isLast ? "Sending…" : "Checking…") : isLast ? "Request a survey" : "Continue"}
             {!pending && <Icon name="arrow-right" />}
           </button>
         </div>
         <p aria-live="polite" className="sr-only">
-          {pending ? "Sending your details" : ""}
+          {pending ? (isLast ? "Sending your details" : "Checking your email address") : ""}
         </p>
         <p className="mt-6 text-sm leading-relaxed text-mid-grey">
           We&apos;ll use your details to reply to your request and arrange your survey. Our{" "}
@@ -309,6 +381,7 @@ function Question({
   controlRef,
   preferredContact,
   onPreferredContactChange,
+  errorAction,
 }: {
   field: SurveyField;
   value: string;
@@ -317,7 +390,13 @@ function Question({
   controlRef: (element: Control | null) => void;
   preferredContact: string;
   onPreferredContactChange: (value: string) => void;
+  /** A way past the problem, shown under it ("Send with this postcode"). */
+  errorAction?: { label: string; onClick: () => void };
 }) {
+  // For the email box: the address they probably meant, if it looks mistyped.
+  // Worked out when they leave the box, so it doesn't flicker while typing.
+  const [suggestion, setSuggestion] = useState<string>();
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const config = surveyFields[field];
   if (config.type === "preference") return null;
   const id = `survey-${field}`;
@@ -325,6 +404,8 @@ function Question({
   const errorId = error ? `${id}-error` : undefined;
   const preference = "preference" in config ? config.preference : undefined;
   const preferred = preference !== undefined && preferredContact === preference;
+  const shownSuggestion =
+    config.type === "email" ? (suggestion ?? (error ? suggestEmail(value) : undefined)) : undefined;
   const shared = {
     id,
     value,
@@ -384,9 +465,16 @@ function Question({
         ) : (
           <input
             {...shared}
-            ref={controlRef}
+            ref={(element) => {
+              inputRef.current = element;
+              controlRef(element);
+            }}
             type={config.type}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={(event) => {
+              setSuggestion(undefined);
+              onChange(event.target.value);
+            }}
+            onBlur={config.type === "email" ? () => setSuggestion(suggestEmail(value)) : undefined}
             autoComplete={config.autoComplete}
             maxLength={config.maxLength}
             spellCheck={config.type === "text" && !config.uppercase ? undefined : false}
@@ -432,6 +520,42 @@ function Question({
           <span className="sr-only">Error: </span>
           {error}
         </p>
+      )}
+      {error && errorAction && (
+        <div className="col-span-2 mt-3">
+          <button
+            type="button"
+            onClick={errorAction.onClick}
+            className={buttonClasses({ variant: "outline-dark", size: "sm" })}
+          >
+            {errorAction.label}
+          </button>
+        </div>
+      )}
+
+      {/* The address they probably meant: shown when they leave the box, and
+          with any problem with the address. Read out when it appears; pressing
+          the address puts it in the box. */}
+      {config.type === "email" && (
+        <div aria-live="polite" className="col-span-2">
+          {shownSuggestion && (
+            <p className="mt-2 text-sm text-charcoal">
+              Did you mean{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  onChange(shownSuggestion);
+                  setSuggestion(undefined);
+                  inputRef.current?.focus();
+                }}
+                className="rounded-[2px] font-semibold break-all text-deep-green underline underline-offset-4 hover:decoration-2"
+              >
+                {shownSuggestion}
+              </button>
+              ?
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

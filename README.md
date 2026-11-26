@@ -10,7 +10,14 @@ npm install
 npm run dev     # http://localhost:3000
 npm run build   # production build
 npm run lint
+npm test        # the survey form's checks (emails, phones, postcodes, greeting)
+npm run test:online  # whether real email domains are found (needs the internet)
 ```
+
+The tests use Node's own test runner (Node 22.18 or newer), so there's nothing
+extra to install. They're lists in `tests/contact-form.test.ts` of what the form
+must accept and what it must turn away: run them whenever its rules change, and
+add any address or number that must keep working (or keep being blocked).
 
 Deploy by importing the repository into Vercel; no extra settings are needed.
 
@@ -100,9 +107,15 @@ default Tailwind colours are switched off, so only brand tokens are available
   `/gallery`, `/privacy-policy` and `/terms`. `/services` already has an anchor
   for each homepage service card.
 - `/contact` is a step-by-step survey request (`components/contact/`). Its steps,
-  dropdown choices and checks are in `lib/survey.ts`; answers go to the server
-  action in `app/contact/actions.ts`, which **doesn't send them anywhere yet**
-  (they are only logged). Connect it to email or a CRM before launch.
+  dropdown choices and checks are in `lib/survey.ts` (email addresses in
+  `lib/emailAddress.ts`); answers go to `/api/survey` (`lib/surveyRequest.ts`),
+  which emails them to ERS and a confirmation to the customer through Resend
+  (`lib/surveyEmail.ts`, settings in `.env.example`). Email addresses must end in
+  a real ending, from IANA's list in `lib/emailEndings.ts`: refresh it now and
+  then with `node scripts/update-email-endings.mjs`. Postcodes must start with a
+  real UK postcode area (`lib/postcode.ts`), and are looked up on postcodes.io
+  when the form is sent (`lib/postcodeLookup.ts`), which also gives the town shown
+  to ERS in the enquiry.
 - `components/layout/` shared `Nav`, `Footer` and inner-page header.
 - `components/home/` homepage sections. The roof-to-solar scene is in
   `components/home/roof-to-solar/`: the SVG is generated on the server and GSAP

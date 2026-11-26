@@ -56,9 +56,14 @@ function emailSite(env: Env) {
 /**
  * Sends the request to ERS, then the customer's confirmation. Throws if the
  * request doesn't go: that's the one that matters, and the visitor is then
- * asked to call instead. A failed confirmation is only logged.
+ * asked to call instead. A failed confirmation is only logged. `place` is
+ * where the postcode is ("Wigan"), shown to ERS with it, if it's known.
  */
-export async function sendSurveyEmails(request: SurveyValues, settings: SurveyEmailSettings) {
+export async function sendSurveyEmails(
+  request: SurveyValues,
+  settings: SurveyEmailSettings,
+  place?: string,
+) {
   const received = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "full",
     timeStyle: "short",
@@ -69,7 +74,7 @@ export async function sendSurveyEmails(request: SurveyValues, settings: SurveyEm
     to: settings.to,
     // Pressing Reply answers the customer directly.
     replyTo: request.email,
-    ...requestEmail(request, received, settings.site),
+    ...requestEmail(request, received, settings.site, place),
   });
 
   try {
@@ -115,7 +120,8 @@ async function send(settings: SurveyEmailSettings, email: Email) {
 // filled in green (both, if they didn't say). The email one starts a new email
 // rather than a reply, so the customer doesn't get this request quoted back to
 // them. Replying still reaches the customer too (Reply-To).
-function requestEmail(r: SurveyValues, received: string, site: string) {
+function requestEmail(r: SurveyValues, received: string, site: string, place?: string) {
+  const postcode = place ? `${r.postcode} (${place})` : r.postcode;
   // The characters that start a subject, a copy to someone else or any other
   // extra in a mailto link are encoded, so an odd address can't add any.
   const address = r.email.replace(/[%?#&]/g, (character) => encodeURIComponent(character));
@@ -128,7 +134,7 @@ function requestEmail(r: SurveyValues, received: string, site: string) {
     ["Email", r.email, emailHref],
     ["Phone", r.phone, phoneHref],
     ["Preferred contact", r.preferredContact || "No preference given"],
-    ["Site postcode", r.postcode],
+    ["Site postcode", postcode],
     ["Service", r.service],
     ["Property type", r.property],
   ];
@@ -175,7 +181,8 @@ function requestEmail(r: SurveyValues, received: string, site: string) {
     site,
   );
 
-  return { subject: `Survey request: ${r.business} (${r.postcode})`, text, html };
+  const where = place ? `${r.postcode}, ${place}` : r.postcode;
+  return { subject: `Survey request: ${r.business} (${where})`, text, html };
 }
 
 /**

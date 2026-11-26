@@ -152,7 +152,11 @@ const sections: LegalSection[] = [
             <strong>Service providers</strong> that handle it for us, and only on our
             instructions: Microsoft, which provides our email (Microsoft 365), Vercel, which
             hosts our website, and Resend, which sends the emails from our website&apos;s survey
-            request form.
+            request form. To catch typos, the form also checks that the part of your email
+            address after the @ (such as company.co.uk) exists, using Cloudflare&apos;s public DNS
+            service, and looks up the postcode you give in the official list of UK postcodes
+            published by the Office for National Statistics, using the free postcodes.io service.
+            Only those are sent: not the rest of your address or any of your other details.
           </li>
           <li>
             <strong>Organisations your project needs</strong>, if you go ahead with work. For
@@ -173,7 +177,7 @@ const sections: LegalSection[] = [
     title: "Information sent outside the UK",
     body: (
       <p>
-        Vercel and Resend are based in the United States, and Microsoft may handle information
+        Vercel, Resend and Cloudflare are based in the United States, and Microsoft may handle information
         outside the UK. When information leaves the UK, it&apos;s protected in the ways UK data protection law
         requires, such as the UK&ndash;US &ldquo;data bridge&rdquo; or contract terms approved by
         the Information Commissioner&apos;s Office (ICO).
