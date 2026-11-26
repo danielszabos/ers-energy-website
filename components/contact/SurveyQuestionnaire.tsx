@@ -340,9 +340,8 @@ export function SurveyQuestionnaire() {
               type="button"
               onClick={() => goTo(step - 1, surveySteps[step - 1].fields[0])}
               disabled={pending}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-4 font-heading text-[0.9375rem] font-semibold text-charcoal transition-colors duration-200 hover:text-deep-base disabled:opacity-50 sm:-ml-4"
+              className={buttonClasses({ variant: "outline-dark", className: "disabled:opacity-50" })}
             >
-              <Icon name="arrow-left" className="size-[1.15em]" />
               Back
             </button>
           )}
@@ -352,7 +351,6 @@ export function SurveyQuestionnaire() {
             className={buttonClasses({ className: "disabled:cursor-wait disabled:opacity-70" })}
           >
             {pending ? (isLast ? "Sending…" : "Checking…") : isLast ? "Request a survey" : "Continue"}
-            {!pending && <Icon name="arrow-right" />}
           </button>
         </div>
         <p aria-live="polite" className="sr-only">
