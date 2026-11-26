@@ -13,9 +13,13 @@ export type SurveyEmailSettings = {
   to: string[];
   /** Where a customer's reply to their confirmation goes. */
   replyTo: string;
+  /** The website the emails link to and load their logo from, e.g. "https://ersenergy.co.uk". */
+  site: string;
 };
 
 type Env = Record<string, string | undefined>;
+
+const ERS_WEBSITE = "https://ersenergy.co.uk";
 
 /**
  * The settings from environment variables (see .env.example), or null when
@@ -34,7 +38,19 @@ export function surveyEmailSettings(env: Env): SurveyEmailSettings | null {
     from: env.SURVEY_EMAIL_FROM?.trim() || `${company.shortName} <${company.email.display}>`,
     to: to.length > 0 ? to : [company.email.display],
     replyTo: env.SURVEY_EMAIL_REPLY_TO?.trim() || company.email.display,
+    site: emailSite(env),
   };
+}
+
+// An email is opened far from this server, so the address its logo loads from
+// has to be public: SURVEY_EMAIL_SITE_URL if it's set (localhost can't be
+// reached from an inbox, so set it when testing locally), else the site's
+// address on Vercel while it's hosted there, else ERS's own domain.
+function emailSite(env: Env) {
+  const configured = env.SURVEY_EMAIL_SITE_URL?.trim();
+  if (configured && URL.canParse(configured)) return new URL(configured).origin;
+  const vercel = env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  return vercel ? `https://${vercel}` : ERS_WEBSITE;
 }
 
 /**
@@ -53,14 +69,14 @@ export async function sendSurveyEmails(request: SurveyValues, settings: SurveyEm
     to: settings.to,
     // Pressing Reply answers the customer directly.
     replyTo: request.email,
-    ...requestEmail(request, received),
+    ...requestEmail(request, received, settings.site),
   });
 
   try {
     await send(settings, {
       to: [request.email],
       replyTo: settings.replyTo,
-      ...confirmationEmail(request),
+      ...confirmationEmail(request, settings.site),
     });
   } catch (error) {
     console.error("Survey confirmation email wasn't sent", error);
@@ -94,7 +110,7 @@ async function send(settings: SurveyEmailSettings, email: Email) {
 
 // The request, for ERS. Everything the visitor typed is escaped before it goes
 // into the HTML.
-function requestEmail(r: SurveyValues, received: string) {
+function requestEmail(r: SurveyValues, received: string, site: string) {
   const rows: [label: string, value: string, href?: string][] = [
     ["Name", r.name],
     ["Business", r.business],
@@ -130,24 +146,29 @@ function requestEmail(r: SurveyValues, received: string) {
      <table role="presentation" style="border-collapse:collapse;font-size:15px;">${tableRows}</table>
      <p style="margin:20px 0 0;color:#5f6661;font-size:13px;">Received ${escapeHtml(received)}</p>
      <p style="margin:16px 0 0;">Reply to this email to answer ${escapeHtml(r.name)} directly.</p>`,
+    site,
   );
 
   return { subject: `Survey request: ${r.business} (${r.postcode})`, text, html };
 }
 
-// The customer's confirmation. It only repeats answers picked from a list or
-// checked against a strict format (service, property type, postcode), never
-// free text, so nobody can use the form to send their own words from ERS's
-// address to someone else.
-function confirmationEmail(r: SurveyValues) {
+// The customer's confirmation. It goes to whatever address was typed into the
+// form, so it only repeats answers that can't carry a message of their own:
+// ones picked from a list or checked against a strict format (service,
+// property type, postcode), and the first name only when firstName below
+// accepts it. Otherwise anyone could use the form to send their own words from
+// ERS's address to someone else.
+function confirmationEmail(r: SurveyValues, site: string) {
   const summary: [string, string][] = [
     ["Service", r.service],
     ["Property type", r.property],
     ["Site postcode", r.postcode],
   ];
+  const first = firstName(r.name);
+  const greeting = first ? `Hello ${first},` : "Hello,";
 
   const text = [
-    "Hello,",
+    greeting,
     "",
     `Thanks for getting in touch with ${company.shortName}. We've received your request for a survey, and someone from the team will be in touch soon to arrange it.`,
     "",
@@ -163,7 +184,7 @@ function confirmationEmail(r: SurveyValues) {
 
   const html = layout(
     "We've received your survey request",
-    `<p style="margin:0 0 16px;">Hello,</p>
+    `<p style="margin:0 0 16px;">${escapeHtml(greeting)}</p>
      <p style="margin:0 0 16px;">Thanks for getting in touch with ${company.shortName}. We've received your request for a survey, and someone from the team will be in touch soon to arrange it.</p>
      <table role="presentation" style="border-collapse:collapse;font-size:15px;margin:0 0 16px;">${summary
        .map(
@@ -174,18 +195,61 @@ function confirmationEmail(r: SurveyValues) {
      <p style="margin:0 0 16px;">If it's urgent, call us on <a href="${company.phone.href}" style="color:#3f7a1f;font-weight:600;">${company.phone.display}</a>, or reply to this email.</p>
      <p style="margin:0;">${company.shortName}</p>
      <p style="margin:24px 0 0;color:#5f6661;font-size:13px;">You're getting this email because this address was used to request a survey on our website. If that wasn't you, you can ignore it.</p>`,
+    site,
   );
 
   return { subject: "We've received your survey request", text, html };
 }
 
-/** A plain, widely supported email layout, with the company details UK law asks business emails to carry. */
-function layout(heading: string, body: string) {
+// English and European letters: A to Z plus accented ones like é, ł and ș.
+// No digits, dots, slashes, spaces or symbols, so a name can't spell out a
+// link or a sentence.
+const nameLetters = "A-Za-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u00FF\\u0100-\\u017F\\u0218-\\u021B";
+// Runs of letters, which may be joined by one hyphen or apostrophe
+// (Anne-Marie, O'Neil, D’Arcy).
+const firstNamePattern = new RegExp(`^[${nameLetters}]+(?:['’-][${nameLetters}]+)*$`);
+// Words people type before their name. "Mr Smith" shouldn't become "Hello Mr,".
+const notFirstNames = new Set([
+  "mr", "mrs", "ms", "miss", "mx", "dr", "prof", "sir", "dame", "lord", "lady",
+  "rev", "revd", "fr", "cllr", "capt", "the",
+]);
+
+/**
+ * The first name to greet the customer by, or null to just say "Hello". Only
+ * the first word of the name is used, and only when it's clearly a name: 2 to
+ * 20 letters, not a title. "daniel" and "DANIEL" become "Daniel"; a name typed
+ * in mixed case, like McDonald, is kept as typed.
+ */
+function firstName(name: string): string | null {
+  const word = name.normalize("NFC").trim().split(/\s+/)[0];
+  if (word.length < 2 || word.length > 20) return null;
+  if (!firstNamePattern.test(word) || notFirstNames.has(word.toLowerCase())) return null;
+  if (word !== word.toLowerCase() && word !== word.toUpperCase()) return word;
+  return word
+    .toLowerCase()
+    .replace(/(^|['’-])(.)/g, (_, joiner: string, letter: string) => joiner + letter.toUpperCase());
+}
+
+/**
+ * A plain, widely supported email layout, with the company details UK law asks
+ * business emails to carry.
+ *
+ * The logo in the dark band at the top is a picture loaded from the website,
+ * and some email apps (Outlook on a PC, mainly) don't load pictures until the
+ * reader allows it. The email reads fine without it: the band is coloured in
+ * the email itself, the picture's fixed size keeps the layout from shifting,
+ * and in its place those apps show "ERS Energy" in white, styled to match. The
+ * picture has the band's colour behind the logo, so the white lettering stays
+ * readable in apps that recolour emails in dark mode (they never recolour
+ * pictures).
+ */
+function layout(heading: string, body: string, site: string) {
   const details = `${company.name}. Registered in ${company.registeredIn}, company number ${company.companyNumber}. Registered office: ${company.registeredOffice.join(", ")}.`;
+  const logo = new URL("/email/ers-logo.png", site).href;
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f3;">
 <table role="presentation" width="100%" style="border-collapse:collapse;background:#f4f5f3;"><tr><td style="padding:24px 12px;">
 <table role="presentation" width="100%" style="max-width:560px;margin:0 auto;border-collapse:collapse;background:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1e2420;">
-<tr><td style="background:#1e2420;padding:18px 28px;color:#ffffff;font-weight:700;font-size:17px;">ERS <span style="color:#8cc63e;">Energy</span></td></tr>
+<tr><td bgcolor="#1e2420" style="background:#1e2420;padding:10px 20px;"><a href="${escapeHtml(site)}" style="text-decoration:none;"><img src="${escapeHtml(logo)}" width="156" height="79" alt="ERS Energy" style="display:block;width:156px;height:79px;border:0;outline:none;text-decoration:none;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;line-height:79px;"></a></td></tr>
 <tr><td style="padding:28px;"><h1 style="margin:0 0 16px;font-size:21px;line-height:1.3;">${heading}</h1>${body}</td></tr>
 <tr><td style="padding:16px 28px;border-top:1px solid #e4e6e3;color:#5f6661;font-size:12px;line-height:1.5;">${escapeHtml(details)}</td></tr>
 </table></td></tr></table></body></html>`;

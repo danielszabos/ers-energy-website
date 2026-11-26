@@ -22,6 +22,8 @@ public/                     served by the site, as-is
   logo/ers-logo-white-text.svg white-text logo, used in the nav and footer
   videos/hero.mp4              hero background (web version)
   videos/hero-poster.jpg       first frame of the hero video
+  email/ers-logo.png           logo in the survey emails' header (PNG, as email
+                               apps don't show SVG), on the header's colour
   accreditations/              one logo per accreditation (to add)
   projects/                    project photos (to add)
 app/icon.svg                the browser tab icon (the logo mark)
